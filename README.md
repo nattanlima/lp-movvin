@@ -52,10 +52,24 @@ A página conduz por benefício e **não discute habilitação**. O gate garante
 
 Os efeitos vieram de reactbits.dev, mas **nenhum trouxe a biblioteca junto**: magic-rings, shape-blur, magnet-lines, flowing-menu e scroll-stack foram reescritos em WebGL cru ou CSS puro. Um `<canvas>` de 200 linhas custa menos que a árvore de dependências que o original arrasta.
 
+### A página responde até 2560px
+
+Toda a escala foi originalmente authorada contra uma faixa de 390px a 1440px e **saturava dentro dela**: acima de 1440px a tela crescia e nada na página respondia. Num monitor de 2543px o container ficava em 53% da tela com 592px de vazio de cada lado, e como toda faixa de cor pinta no `<section>` (que vai até a borda), o resultado era faixa cheia com o conteúdo espremido no meio.
+
+Hoje `--mv-largura`, `--mv-goteira`, `.mv-h1`, `.mv-h2` e `.mv-section` têm uma segunda rampa que **começa exatamente onde a antiga saturava, com o mesmo valor**. Tudo até 1440px continua byte-idêntico ao que foi validado; a curva é contínua, sem degrau.
+
+| viewport | container | h1 | grid |
+|---|---|---|---|
+| 1440px | 1360px (94%) | 83,2px | 3×416px |
+| 1920px | 1690px (88%) | 99,1px | 3×518px |
+| 2543px | 2100px (83%) | 120px | 5×379px |
+
+Ao mexer em qualquer um desses valores, **meça** — não estime. O histórico está em [`planejamento/07`](planejamento/07-construcao-e-deploy.md#6-a-página-parava-de-responder-em-1440px), incluindo dois comentários do próprio código que estavam errados.
+
 ### Duas regras rígidas do projeto
 
 - **Zero `addEventListener('scroll')`.** Toda animação ligada a rolagem usa `animation-timeline: scroll()`/`view()` ou `IntersectionObserver`. Listener de scroll roda na main thread e trava o dispositivo do público alvo.
-- **Contraste é medido, nunca estimado.** Todo par cor/fundo da paleta foi calculado.
+- **Contraste é medido, nunca estimado.** Todo par cor/fundo da paleta foi calculado. Para texto sobre imagem, medir **só onde há glifo** (fotografar com e sem texto e comparar): o pixel mais claro da caixa reprova coisa que passa.
 
 ### Peso medido
 

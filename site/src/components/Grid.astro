@@ -71,7 +71,17 @@ const USOS = [
       por indice e para em 5 (--mv-i), senao o ultimo card de uma linha longa
       demoraria a aparecer depois de ja estar visivel. */}
   <div class="mv-container pt-8 pb-24 sm:pt-12 sm:pb-32">
-    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    {/* 5 modelos em 3 colunas dao 3+2, com um buraco orfao na segunda linha.
+        Isso ja era verdade a 1440px e la esta certo: nao cabe mais que 3.
+        Com o container fluido, acima de 2100px de viewport o conteudo passa de
+        1730px e os 5 cards cabem numa fileira so, com ~380px cada — o mesmo
+        tamanho de card ja validado a 1440px (413px). A secao se chama "A
+        linha": mostrar a linha INTEIRA numa passada e o que ela promete.
+        4 colunas foi descartado de proposito: daria 4+1, orfao pior que 3+2.
+        O breakpoint 3xl (2100px) foi registrado no @theme do global.css
+        porque nenhum breakpoint de fabrica do Tailwind cai onde a conta
+        fecha. Ver la o motivo de nao ser a variante arbitraria min-[2100px]. */}
+    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-5">
       {modelos.map((m, i) => <CardModelo modelo={m.data} indice={i} />)}
     </div>
   </div>

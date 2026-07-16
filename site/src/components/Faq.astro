@@ -62,7 +62,19 @@ const FAQ = [
 ];
 ---
 
-<section id="faq" class="relative scroll-mt-20 bg-mv-bg">
+{/* >>> O FAQ NAO SEGUE A LARGURA DO RESTO DA PAGINA, E DE PROPOSITO <<<
+    Aqui o conteudo do card e uma RESPOSTA: um bloco de texto com medida de
+    leitura travada em 54ch (~613px). Ele nao cresce junto com o card, entao
+    todo pixel de card alem disso vira lima vazio.
+    Medido: a 1440px o card tem 1288px e ja e 52% vazio — e essa e a proporcao
+    que o design sempre teve e que foi aprovada. Deixando o FAQ herdar o
+    --mv-largura novo (2100px), o card ia para 1973px e o vazio subia para 69%:
+    a secao ficava PIOR justamente com a mudanca que conserta o resto.
+    O teto proprio de 1600px e o meio-termo medido: o card vai a ~1473px
+    (63% da tela em 2543px, contra 53% antes, ou seja deixa de parecer
+    espremido) e o vazio fica em ~58%, perto dos 52% de sempre.
+    O piso de 1360px mantem tudo ate 1440px byte-identico, igual ao resto. */}
+<section id="faq" class="relative scroll-mt-20 bg-mv-bg" style="--mv-largura: clamp(1360px, 88vw, 1600px);">
   <div class="mv-container pt-24 pb-8 sm:pt-32">
     <p class="mv-eyebrow">Perguntas.</p>
     <h2 class="mv-display mv-h2 mt-4 max-w-[16ch] text-mv-text-1">

@@ -110,7 +110,73 @@ assets/
 
 ---
 
-## 6. Deploy
+## 6. A página parava de responder em 1440px
+
+Relatado pelo cliente num monitor de 2560px: *"por que as coisas estão tão espremidas no centro da tela?"*
+
+Medido com Playwright, e o número explica tudo:
+
+| viewport | container | vazio de cada lado |
+|---|---|---|
+| 1440px | 94% da tela | 40px |
+| 1920px | 71% | 280px |
+| 2543px | **53%** | **592px** |
+
+**A página renderizava idêntica em 1440px e em 2543px.** Não havia "layout de tela grande": havia a mesma página com mais preto em volta. A causa não era só o `--mv-largura: 1360px` cravado — era que **toda a escala foi authorada contra uma faixa de 390px a 1440px e saturava dentro dela**:
+
+- `.mv-h1` saturava em 1445,7px. Entre 1440px e 2543px a tela ganha 76,6% e a headline ganhava **0,27%**: caía de 5,8% para 3,3% da largura da tela.
+- `.mv-h2` saturava em **1040px**, 400px antes de um laptop comum. Como ela governa Grid, Benefícios, FAQ, Revendedor, Trabalho, Escola, Apoio e as 3 páginas internas, era **ela, e não o hero**, que espalhava a sensação de miniatura pela página toda.
+- `.mv-section` (respiro vertical) saturava em 1280px. Medido: 128px em 1440px **e** em 2543px. Ninguém reduziu o espaçamento; a tela cresceu 1103px e o respiro não cresceu 1px, então caiu de 17,8% para 10,1% da largura e **lê** como se tivesse encolhido. A queixa do cliente estava certa; a causa era o valor fixo.
+- Ironia medida: a `--mv-goteira` é vw-based e continuava crescendo com o container já parado. De 1440px a 2543px a tela ganhava 1103px e a coluna de texto **perdia 8px**.
+
+E o descompasso que dava o aspecto de "espremido": **toda faixa de cor pinta no `<section>`**, que é block-level e vai até a borda. Então o olho via faixa lima cheia de ponta a ponta com o conteúdo numa coluna no meio.
+
+### O que a análise derrubou
+
+O plano óbvio (subir o `--mv-largura`) teria quebrado três coisas:
+
+1. **O hero pioraria.** A moto é presa pela **altura**, não pelo container: media 1354px em qualquer largura. Ela já está no tamanho máximo que o farol permite — crescer pela largura cortaria 47,4% da imagem e jogaria o farol 139px para fora do quadro. Alargar move só o *texto* para a esquerda, **descolando ele do produto** que ele deveria sobrepor, com o scrim radial apontado para onde o texto não está mais.
+2. **Os cards do grid não tinham cap de texto nenhum.** O resto da página protege a medida com `max-w` em ch, mas no `CardModelo` a largura da linha era um acidente da largura do card: alargar esticaria a linha 1,6×.
+3. **O FAQ ficaria pior.** O card já era 52% vazio em 1440px (a resposta tem medida travada em 54ch). Herdando 2100px ele iria a 69% vazio.
+
+### Dois comentários do próprio código estavam errados
+
+Medido no browser com a fonte carregada: **"Não precisa ser." dá 6,78em, não "~8em"** como o comentário afirmava — 18% de superestimativa. Pelo número dele a headline já estaria vazando a coluna hoje, o que fez a linha parecer intocável quando tem folga de **1,87×** até o cartão MVS-01.
+
+O mesmo comentário temia "quebra automática em 4 linhas". Com `text-wrap: nowrap` logo abaixo isso é impossível — nowrap proíbe toda quebra. O modo de falha real é o oposto: overflow horizontal.
+
+### O que mudou
+
+Todas as rampas começam **exatamente onde as antigas saturavam, com o mesmo valor**: a curva é contínua e tudo até 1440px continua byte-idêntico ao que foi validado.
+
+| | de | para | 2543px |
+|---|---|---|---|
+| `--mv-largura` | `1360px` | `clamp(1360px, 88vw, 2100px)` | 83% da tela |
+| `--mv-goteira` | teto `2.5rem` | teto `4rem` | 64px |
+| `.mv-h1` | satura 1446px | 2ª rampa | 120px |
+| `.mv-h2` | satura 1040px | 2ª rampa | 96px |
+| `.mv-section` | satura 1280px | 2ª rampa | 176px |
+| Grid | 3 col p/ sempre | `3xl:grid-cols-5` | 5×379px, a linha inteira |
+| CardModelo | sem cap | `44ch` / `56ch` | linha protegida |
+| FAQ | herdava tudo | teto próprio 1600px | 58% vazio (era 52%) |
+
+O breakpoint `3xl` (2100px) teve que ser **registrado no `@theme`**, não usado como variante arbitrária: o Tailwind 4 emite `min-[2100px]:` **antes** dos breakpoints nomeados, então `min-[2100px]:grid-cols-5` perdia a cascata para `lg:grid-cols-3` justamente onde deveria valer.
+
+### Verificado por medição
+
+| viewport | container | h1 | h2 | grid | contraste da headline |
+|---|---|---|---|---|---|
+| 1440px | 1360px (94%) | 83,2px | 68px | 3×416px | 12,63:1 / 9,69:1 |
+| 1920px | 1690px (88%) | 99,1px | 80,2px | 3×518px | 11,69:1 / 8,97:1 |
+| 2543px | 2100px (83%) | 120px | 96px | **5×379px** | **19,57:1 / 15,01:1** |
+
+1440px saiu idêntico em todos os campos. Zero overflow horizontal de 390px a 2543px.
+
+**Nota de método sobre o contraste.** A primeira medição usou o pixel mais claro da *caixa* da headline e reprovou tudo (3,52:1). Era falso alarme: o pixel claro existia na caixa mas não embaixo de letra nenhuma. A medição correta fotografa a headline **com e sem texto** e mede só onde os dois diferem, que é onde há glifo. Vale registrar porque o método pessimista quase gerou uma "correção" de um problema inexistente.
+
+---
+
+## 7. Deploy
 
 **GitHub Pages**, push na `main` → [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml).
 

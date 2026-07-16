@@ -64,6 +64,19 @@
   /* --- Motion ------------------------------------------------------------
      ease-in-out e linear sao vetados. Esta curva e a unica da pagina. */
   --ease-mv: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* --- Breakpoint de monitor grande --------------------------------------
+     131.25rem = 2100px. E onde o conteudo passa de 1730px e os 5 modelos
+     cabem numa fileira so (ver Grid.astro).
+     TEM que ser um breakpoint de tema, e nao a variante arbitraria
+     min-[2100px]: — o Tailwind 4 emite as variantes arbitrarias ANTES dos
+     breakpoints nomeados, entao min-[2100px]:grid-cols-5 saia antes de
+     lg:grid-cols-3 no arquivo e perdia a cascata justamente onde deveria
+     valer (as duas casam a 2543px, e a ultima vence). Registrado no @theme
+     ele e ordenado pelo VALOR e cai depois do lg, como precisa.
+     Em media query, rem sempre resolve contra 16px (o valor inicial), nao
+     contra a font-size do html: 131.25rem e 2100px de verdade. */
+  --breakpoint-3xl: 131.25rem;
 }
 
 /* --- Fontes self-hosted: zero request a fonts.googleapis.com --------------
@@ -100,9 +113,37 @@
     /* A geometria do recuo mora aqui, nao no .mv-container: quem precisa ir
        full bleed e mesmo assim alinhar o texto com a pagina (ver .mv-bleed)
        tem que reproduzir a mesma conta, e duas fontes de verdade divergem
-       na primeira vez que alguem mexer numa delas. */
-    --mv-largura: 1360px;
-    --mv-goteira: clamp(1rem, 2.5vw, 2.5rem);
+       na primeira vez que alguem mexer numa delas.
+
+       >>> A PAGINA RESPONDE ATE 2560px, NAO ATE 1440px <<<
+       --mv-largura era 1360px CRAVADO. Isso nao e "largura maxima de leitura":
+       e um teto que congela a pagina inteira. Medido num monitor de 2543px:
+       o container ficava em 53% da tela, com 592px de preto morto de cada
+       lado, e como TODA faixa de cor pinta no <section> (que e block-level e
+       vai ate a borda), o resultado era faixa cheia + conteudo espremido no
+       miolo. A pagina renderizava IDENTICA em 1440px e 2543px.
+
+       Por que a medida de leitura nao sofre: cada bloco de texto tem cap
+       proprio em ch/rem (max-w-[52ch], [58ch], [42ch]...). O container so
+       POSICIONA; quem protege a linha e o proprio bloco. Alargar aqui fecha o
+       vao sem esticar uma linha sequer. (Excecao: o CardModelo nao tinha cap
+       nenhum e ganhou um junto com esta mudanca. Sem ele, alargar esticaria a
+       linha do card em 1,6x.)
+
+       O piso de 1360px e deliberado: abaixo de 1545px o clamp devolve 1360 e
+       tudo ate 1440px continua BYTE-IDENTICO ao que ja foi validado e esta no
+       ar. A rampa so comeca acima disso.
+         1440px -> 1360px (94% da tela, intocado)
+         1920px -> 1690px (88%)
+         2543px -> 2100px (83%)
+       O teto de 2100px existe porque o grid de 5 modelos fecha em 5 colunas de
+       ~390px ali, que e o tamanho de card ja validado em 1440px. */
+    --mv-largura: clamp(1360px, 88vw, 2100px);
+    /* O teto subiu de 2.5rem para 4rem. Ate 1600px o valor e o mesmo de antes
+       (2.5vw ainda nao encostou no teto), entao nada muda no laptop. Acima
+       disso a goteira volta a crescer: 40px de recuo numa tela de 2543px lia
+       como conteudo colado na borda. Satura em 2560px. */
+    --mv-goteira: clamp(1rem, 2.5vw, 4rem);
   }
 
   /* O fundo mora SO no html. Se o body tambem tiver background-color, ele
@@ -181,11 +222,25 @@
     text-transform: uppercase;
   }
 
-  /* Dimensionada para que a linha mais longa do hero ("Não precisa ser.",
-     16 caracteres em Archivo 900/wdth68 ~= 8em) caiba SEM quebrar na coluna,
-     de 390px ate 1440px. Se a headline mudar, refazer a conta: uma quebra
-     automatica aqui reparte a frase em 4 linhas e mata o ritmo de 2 tempos
-     que e a voz da marca. */
+  /* Dimensionada para que a linha mais longa do hero ("Não precisa ser.")
+     caiba SEM quebrar na coluna, de 390px ate 1440px.
+
+     >>> DOIS ERROS DO COMENTARIO ANTIGO, CORRIGIDOS POR MEDICAO <<<
+     1. Ele afirmava que a linha tem "~8em". MEDIDO no browser com a fonte
+        carregada (Archivo Variable, wght 900, wdth 68%, letter-spacing
+        -0.03em): "Não precisa ser." da 563px a 83px = 6,78em, nao 8em. O
+        comentario superestimava em 18%. Pelo numero dele a headline ja
+        estaria vazando a coluna hoje (8 x 83,2 = 665px numa coluna de 608px),
+        o que fez a linha parecer intocavel quando ela tem folga larga.
+     2. Ele temia "quebra automatica em 4 linhas". Com text-wrap: nowrap logo
+        abaixo isso e impossivel: nowrap proibe toda quebra. O modo de falha
+        real e o oposto, overflow horizontal — a frase vazando pra direita e
+        indo encostar no cartao MVS-01.
+     A folga REAL ate o cartao sao 1051px de corrida limpa contra 563px em
+     uso: fator 1,87x. Por isso a segunda rampa abaixo e segura.
+
+     A rampa base (390->1440px) esta INTOCADA: ela satura em 1445,7px e e o
+     que ja foi validado. */
   .mv-h1 {
     font-size: clamp(2.6rem, 1.64rem + 3.94vw, 5.2rem);
     text-wrap: nowrap;
@@ -193,6 +248,32 @@
 
   .mv-h2 {
     font-size: clamp(2rem, 1rem + 5vw, 4.25rem);
+  }
+
+  /* --- SEGUNDA RAMPA: o que fazer depois de 1440px -----------------------
+     Toda a escala tipografica foi authorada contra uma faixa de 390 a 1440px
+     e saturava dentro dela. Acima disso a tela crescia e a tipografia nao:
+     entre 1440px e 2543px a tela ganha 76,6% e a .mv-h1 ganhava 0,27%. A
+     headline caia de 5,8% para 3,3% da largura da tela — quase METADE do peso
+     optico que o design entrega no laptop. Nao era "container estreito": era
+     tipografia miniatura num quadro grande.
+
+     A .mv-h2 era o pior caso e o menos obvio: saturava em 1040px, 400px ANTES
+     de um laptop comum. E ela que governa Grid, Beneficios, Faq, Revendedor,
+     Trabalho, Escola, Apoio e os titulos das 3 paginas internas — ou seja, era
+     ela, e nao o hero, que espalhava a sensacao de miniatura pela pagina toda.
+
+     As duas rampas comecam exatamente onde as de cima saturam, com o mesmo
+     valor: a curva e continua, sem degrau. Abaixo de 1440px nada muda. */
+  @media (min-width: 1440px) {
+    /* 1446px -> 83,2px (o valor que ja tinha) · 2543px -> 120px */
+    .mv-h1 {
+      font-size: clamp(5.2rem, 2.169rem + 3.354vw, 7.5rem);
+    }
+    /* 1440px -> 68px (o valor que ja tinha) · 2543px -> 96px */
+    .mv-h2 {
+      font-size: clamp(4.25rem, 1.965rem + 2.539vw, 6rem);
+    }
   }
 
   /* --- Eyebrow: orcamento de 3 na pagina inteira -------------------------- */
@@ -281,8 +362,23 @@
     padding-inline: calc(max(0px, (100% - var(--mv-largura)) / 2) + var(--mv-goteira));
   }
 
+  /* O RESPIRO VERTICAL TEM A MESMA DOENCA DA LARGURA.
+     clamp(4.5rem, 10vw, 8rem) satura em 1280px: de la pra cima o padding fica
+     cravado em 128px pra sempre. Medido em 1440px e em 2543px: 128px nos DOIS.
+     Ninguem reduziu o espacamento; a tela cresceu 1103px e o respiro nao
+     cresceu 1px, entao ele passa de 17,8% da largura da tela para 10,1% e le
+     como se tivesse encolhido pela metade. A percepcao esta certa, a causa e
+     que o valor e fixo.
+     A rampa abaixo continua a curva de onde ela parava, com o mesmo valor no
+     ponto de emenda: 1280px -> 128px (identico ao de hoje), 2543px -> 176px.
+     Abaixo de 1280px nada muda. */
   .mv-section {
     padding-block: clamp(4.5rem, 10vw, 8rem);
+  }
+  @media (min-width: 1280px) {
+    .mv-section {
+      padding-block: clamp(8rem, 4.96rem + 3.8vw, 11rem);
+    }
   }
 
   /* Numeros de spec alinham em coluna. */

@@ -81,8 +81,17 @@ const { modelo: m, indice = 0 } = Astro.props;
       {m.triade[0]}. {m.triade[1]}. <span class="text-mv-green-500">{m.triade[2]}</span>
     </p>
 
-    <p class="mt-4 text-lg leading-snug font-semibold text-mv-text-1">{m.chamada}</p>
-    <p class="mt-2 text-sm leading-relaxed text-mv-text-2">{m.oQueE}</p>
+    {/* >>> OS CAPS EM ch SAO O QUE PERMITE O CONTAINER CRESCER <<<
+        O resto da pagina protege a medida de leitura com max-w em ch, mas o
+        card NAO tinha cap nenhum: a largura da linha aqui era um acidente da
+        largura do card. Enquanto o container era 1360px cravado isso nunca
+        aparecia. Com o container fluido ate 2100px o card vai de 413px a
+        ~518px e a linha esticaria ~1,6x sem estes dois caps.
+        Os valores sao FOLGADOS de proposito: a 1440px a coluna de texto do
+        card tem 365px e nenhum dos dois morde ali, entao o laptop continua
+        byte-identico. Eles so entram em acao quando o card engorda. */}
+    <p class="mt-4 max-w-[44ch] text-lg leading-snug font-semibold text-mv-text-1">{m.chamada}</p>
+    <p class="mt-2 max-w-[56ch] text-sm leading-relaxed text-mv-text-2">{m.oQueE}</p>
 
     {/* 2 specs heroi em display grande. */}
     <dl class="mv-nums mt-6 grid grid-cols-2 gap-3">
@@ -103,7 +112,7 @@ const { modelo: m, indice = 0 } = Astro.props;
     <ul class="mt-5 space-y-2.5">
       {
         m.beneficios.map((b) => (
-          <li class="flex gap-2.5 text-sm leading-relaxed text-mv-text-2">
+          <li class="flex max-w-[56ch] gap-2.5 text-sm leading-relaxed text-mv-text-2">
             <span aria-hidden="true" class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-mv-green-500" />
             <span>{b}</span>
           </li>
