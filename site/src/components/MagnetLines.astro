@@ -1,0 +1,175 @@
+---
+/* ============================================================================
+ * MAGNET LINES · porte do componente do reactbits.dev para Astro/JS puro
+ * ----------------------------------------------------------------------------
+ * Grade de tracinhos que giram apontando pro cursor, como limalha de ferro
+ * seguindo um ima. O original e React; aqui e o mesmo calculo (atan2 do vetor
+ * centro-do-traco -> ponteiro) sem framework.
+ *
+ * Diferencas em relacao ao original, todas por custo:
+ *  - pointermove agregado num unico rAF: o original recalcula os 180 tracos a
+ *    cada evento, e pointermove dispara a ~120Hz em mouse gamer.
+ *  - so escuta enquanto a secao esta em cena (IntersectionObserver).
+ *  - prefers-reduced-motion: fica no baseAngle, nunca escuta o ponteiro.
+ *  - o ponteiro nasce no centro da grade, entao a peca ja abre organizada em
+ *    vez de toda torta esperando o primeiro movimento.
+ * ========================================================================== */
+
+interface Props {
+  rows?: number;
+  columns?: number;
+  lineColor?: string;
+  lineWidth?: string;
+  lineHeight?: string;
+  baseAngle?: number;
+  class?: string;
+}
+
+const {
+  rows = 9,
+  columns = 20,
+  lineColor = 'var(--color-mv-bg)',
+  lineWidth = '2px',
+  lineHeight = '38px',
+  baseAngle = -10,
+  class: klass = '',
+} = Astro.props;
+
+const total = rows * columns;
+---
+
+<div
+  class={`mv-magnet ${klass}`}
+  data-mv-magnet
+  data-base={baseAngle}
+  aria-hidden="true"
+  style={`--rows:${rows}; --columns:${columns}; --lw:${lineWidth}; --lh:${lineHeight}; --lc:${lineColor}; --base:${baseAngle}deg;`}
+>
+  {Array.from({ length: total }).map(() => <span />)}
+</div>
+
+<style>
+  .mv-magnet {
+    display: grid;
+    grid-template-columns: repeat(var(--columns), 1fr);
+    grid-template-rows: repeat(var(--rows), 1fr);
+    justify-items: center;
+    align-items: center;
+    pointer-events: none;
+  }
+
+  .mv-magnet span {
+    display: block;
+    width: var(--lw);
+    height: var(--lh);
+    background-color: var(--lc);
+    border-radius: 1px;
+    transform-origin: center;
+    transform: rotate(var(--rotate, var(--base)));
+    will-change: transform;
+    /* O giro segue o cursor com folga: sem transicao a grade vibra e vira
+       ruido; com folga demais ela parece presa. 380ms e onde ela "responde". */
+    transition: transform 380ms var(--ease-mv);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mv-magnet span {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  /* UMA INSTANCIA POR GRADE.
+     A versao anterior usava querySelector no SINGULAR e fechava sobre uma
+     unica grade. Com duas faixas na pagina (Beneficios e Revendedor) a
+     segunda renderizava os tracos e nunca animava: ficava um decalque parado
+     no baseAngle, indistinguivel de bug de CSS. Agora cada grade tem seu
+     proprio estado, e o listener de ponteiro e UM so, compartilhado: dois
+     listeners fariam o mesmo trabalho duas vezes por evento. */
+
+  type Grade = {
+    el: HTMLElement;
+    tracos: HTMLElement[];
+    offsets: { x: number; y: number }[];
+    ativo: boolean;
+    agendado: boolean;
+  };
+
+  function montar(el: HTMLElement): Grade {
+    const g: Grade = {
+      el,
+      tracos: Array.from(el.querySelectorAll<HTMLElement>('span')),
+      offsets: [],
+      ativo: false,
+      agendado: false,
+    };
+
+    /* Os centros sao guardados RELATIVOS a grade, nao em coordenadas de tela.
+       Assim o scroll nao os invalida e nao preciso de listener de scroll, que
+       e proibido no projeto (jank na main thread). Por frame: UM
+       getBoundingClientRect na grade + aritmetica nos tracos. */
+    const medir = () => {
+      const r0 = el.getBoundingClientRect();
+      g.offsets = g.tracos.map((t) => {
+        const r = t.getBoundingClientRect();
+        return { x: r.x + r.width / 2 - r0.x, y: r.y + r.height / 2 - r0.y };
+      });
+    };
+    (g as any).medir = medir;
+
+    new IntersectionObserver(
+      ([e]) => {
+        g.ativo = e.isIntersecting;
+        // Abre organizada: aponta pro centro da propria grade.
+        if (g.ativo && !g.offsets.length) {
+          medir();
+          const r = el.getBoundingClientRect();
+          aplicar(g, { x: r.x + r.width / 2, y: r.y + r.height / 2 });
+        }
+      },
+      { threshold: 0 },
+    ).observe(el);
+
+    new ResizeObserver(() => g.ativo && medir()).observe(el);
+    return g;
+  }
+
+  function aplicar(g: Grade, alvo: { x: number; y: number }) {
+    if (!g.offsets.length) return;
+    const r0 = g.el.getBoundingClientRect();
+    for (let i = 0; i < g.tracos.length; i++) {
+      const o = g.offsets[i];
+      const b = alvo.x - (r0.x + o.x);
+      const a = alvo.y - (r0.y + o.y);
+      const h = Math.sqrt(a * a + b * b) || 1;
+      const r = ((Math.acos(b / h) * 180) / Math.PI) * (a > 0 ? 1 : -1);
+      g.tracos[i].style.setProperty('--rotate', `${r}deg`);
+    }
+  }
+
+  const grades = Array.from(document.querySelectorAll<HTMLElement>('[data-mv-magnet]')).map(montar);
+
+  if (grades.length && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let alvo: { x: number; y: number } | null = null;
+    let agendado = false;
+
+    const frame = () => {
+      agendado = false;
+      if (!alvo) return;
+      // So a grade em cena trabalha: as outras nem tocam no DOM.
+      for (const g of grades) if (g.ativo) aplicar(g, alvo);
+    };
+
+    window.addEventListener(
+      'pointermove',
+      (e) => {
+        alvo = { x: e.clientX, y: e.clientY };
+        if (agendado) return;
+        agendado = true;
+        requestAnimationFrame(frame);
+      },
+      { passive: true },
+    );
+  }
+</script>

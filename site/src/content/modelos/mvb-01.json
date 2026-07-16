@@ -1,0 +1,31 @@
+{
+  "codigo": "MVB-01",
+  "nome": "MVB-01",
+  "categoria": "bike",
+  "categoriaLabel": "Bike elétrica",
+  "ordem": 1,
+  "triade": [
+    "LEVE",
+    "DISCRETA",
+    "100% ELÉTRICA."
+  ],
+  "chamada": "Leve pro dia a dia.",
+  "potenciaW": 500,
+  "velocidadeMaximaKmh": 35,
+  "rodas": 2,
+  "oQueE": "Quadro baixo, cesto na frente e banco corrido com encosto. Sobe e desce sem esforço.",
+  "beneficios": [
+    "Bateria removível: carrega na tomada de casa",
+    "Painel LCD e NFC: liga com aproximação",
+    "Cesto e banco duplo de série"
+  ],
+  "usos": [
+    "dia-a-dia",
+    "escola"
+  ],
+  "imagem": "/img/mvb-01",
+  "imagemAlt": "MVB-01: bike elétrica preta e vermelha, de quadro baixo, com cesto de arame na frente e banco corrido com encosto",
+  "largura": 900,
+  "altura": 849,
+  "publicado": true
+}

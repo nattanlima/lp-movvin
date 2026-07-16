@@ -1,0 +1,64 @@
+# ==============================================================================
+# Deploy para GitHub Pages
+# ------------------------------------------------------------------------------
+# Roda `npm run build`, que passa pelo GATE (scripts/check-spec.mjs) antes do
+# astro build. Isso e o ponto: o gate nao e um lembrete de dev, e a condicao de
+# publicacao. Se um campo do piso legal do CDC sumir de src/lib/site.ts, ou se
+# alguem escrever "dispensa CNH" numa secao, o deploy FALHA e a pagina no ar
+# continua sendo a ultima versao boa. Nunca trocar por `build:unsafe` aqui.
+# ==============================================================================
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # permite republicar pela aba Actions sem precisar de commit
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Um deploy por vez. `cancel-in-progress: false` de proposito: cancelar um
+# deploy no meio pode deixar o Pages servindo um artefato parcial.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      # `npm ci` e nao `npm install`: respeita o lockfile e falha se ele estiver
+      # dessincronizado, em vez de resolver versao nova no servidor de build.
+      - name: Instalar
+        working-directory: site
+        run: npm ci
+
+      - name: Build (passa pelo gate)
+        working-directory: site
+        run: npm run build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

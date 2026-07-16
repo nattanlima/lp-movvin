@@ -1,0 +1,171 @@
+---
+import { site, linkWhatsApp } from '../lib/site';
+
+/* ============================================================================
+ * FAQ · scroll stack
+ * ----------------------------------------------------------------------------
+ * Efeito inspirado no ScrollStack do reactbits.dev, mas SEM o componente.
+ * O original depende do Lenis, uma lib de smooth scroll que substitui a rolagem
+ * nativa por uma interpolada em JS. Isso e exatamente o que nao pode aqui: o
+ * pedido era "nao atrapalha a navegacao", e sequestrar o scroll quebra a roda
+ * do mouse, o arrasto da barra, o Page Down, o scroll-to das ancoras e o
+ * momentum do iOS. Alem de ~20 KB.
+ *
+ * Aqui o empilhamento e position:sticky com um topo incremental por card
+ * (--i), e o encolhimento e scroll-driven animation nativa. A rolagem continua
+ * sendo a do browser: nada e interceptado, nada e interpolado.
+ *
+ * Sem suporte a animation-timeline, os cards continuam empilhando por sticky,
+ * so nao encolhem. O conteudo nunca depende do efeito pra ser lido.
+ *
+ * CORES: so lima e cinza-claro, texto sempre preto. Sobre o lima o preto da
+ * 15,19:1; sobre o cinza, mais ainda. Branco em qualquer um dos dois some.
+ * ========================================================================== */
+
+const FAQ = [
+  {
+    q: 'O que é uma Movvin?',
+    r: 'Bike, scooter ou triciclo 100% elétrico, feito pra cidade. Painel LCD, NFC pra ligar por aproximação, e motor que vai de 500 W a 1.000 W dependendo do modelo.',
+    tom: 'lima',
+  },
+  {
+    q: 'Onde eu carrego?',
+    r: 'Na tomada comum de casa, igual a qualquer eletrodoméstico. Sem posto, sem instalação especial, sem carregador de parede. O combustível vira conta de luz.',
+    tom: 'cinza',
+  },
+  {
+    q: 'O que precisa de manutenção?',
+    r: 'Muito menos que um veículo a combustão. Motor elétrico não tem óleo pra trocar, nem correia, nem vela, nem embreagem. Sobram freio, pneu e bateria.',
+    tom: 'lima',
+  },
+  {
+    q: 'Como funciona o nome dos modelos?',
+    r: 'Todo modelo começa com MV, de Movvin. A letra seguinte é a categoria: B de bike, S de scooter, T de triciclo. O número é o sequencial. Então MVB-01 é a primeira bike, MVT-03 é o triciclo.',
+    tom: 'cinza',
+  },
+  {
+    q: 'Quem pode comprar?',
+    r: 'Qualquer pessoa. A gente atende de quem usa pra trabalhar e rodar o dia inteiro a quem quer só resolver o dia a dia sem depender de ninguém. Fala com a gente que a gente te ajuda a escolher.',
+    tom: 'lima',
+  },
+  {
+    q: 'Onde vocês ficam?',
+    r: `${site.endereco}, ${site.cidade}/${site.uf}. Também dá pra resolver tudo pelo WhatsApp, sem sair de casa.`,
+    tom: 'cinza',
+  },
+  {
+    q: 'Como eu compro?',
+    r: 'Pelo WhatsApp. Você diz pra que vai usar, a gente indica o modelo e passa as condições. Sem formulário, sem cadastro, sem esperar e-mail.',
+    tom: 'lima',
+    cta: true,
+  },
+];
+---
+
+<section id="faq" class="relative scroll-mt-20 bg-mv-bg">
+  <div class="mv-container pt-24 pb-8 sm:pt-32">
+    <p class="mv-eyebrow">Perguntas.</p>
+    <h2 class="mv-display mv-h2 mt-4 max-w-[16ch] text-mv-text-1">
+      Sem <span class="text-mv-green-500">enrolação.</span>
+    </h2>
+  </div>
+
+  {/* A pilha. Cada card gruda num topo levemente maior que o anterior, entao
+      sobra uma faixa do card de baixo aparecendo: e o que faz ler como pilha
+      e nao como troca de slide. */}
+  <ul class="mv-container mv-stack list-none pb-24 sm:pb-32">
+    {
+      FAQ.map((f, i) => (
+        <li class="mv-stack-card" style={`--i: ${i}`}>
+          <div
+            class:list={[
+              'mv-stack-inner rounded-3xl p-7 sm:p-10',
+              f.tom === 'lima' ? 'bg-mv-green-500' : 'bg-mv-faq-cinza',
+            ]}
+            style="--mv-focus: var(--color-mv-bg);"
+          >
+            <p class="mv-nums font-display text-xs font-bold tracking-[0.14em] text-mv-bg/50">
+              {String(i + 1).padStart(2, '0')}
+            </p>
+            <h3 class="mv-display mt-3 text-[clamp(1.5rem,1rem+1.8vw,2.5rem)] text-mv-bg">{f.q}</h3>
+            <p class="mt-4 max-w-[54ch] text-base leading-relaxed text-mv-bg/80 sm:text-lg">{f.r}</p>
+            {f.cta && (
+              <a
+                href={linkWhatsApp({ tipo: 'compra' })}
+                class="mv-btn mv-btn-on-green group mt-7 gap-2.5"
+                data-mv-event="whatsapp"
+                data-mv-valor="faq"
+                rel="nofollow"
+              >
+                Falar no WhatsApp
+                <span
+                  aria-hidden="true"
+                  class="flex h-6 w-6 items-center justify-center rounded-full border border-mv-green-500/35 text-xs transition-transform duration-300 group-hover:translate-x-0.5"
+                  style="transition-timing-function: var(--ease-mv);"
+                >
+                  →
+                </span>
+              </a>
+            )}
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .mv-stack {
+    /* O empilhamento vive aqui: cada card precisa de espaco de rolagem entre
+       ele e o proximo, senao gruda e desgruda no mesmo frame. */
+    display: block;
+  }
+
+  .mv-stack-card {
+    position: sticky;
+    /* Topo incremental: o card 0 gruda mais alto, o 1 um pouco abaixo, e por
+       aí. E o degrau que revela a pilha. */
+    top: calc(6rem + var(--i) * 14px);
+    /* Esta margem E a distancia de rolagem de cada card: e o que o proximo
+       precisa percorrer pra cobrir o anterior. 42vh deixava um buraco preto
+       entre um card e outro e esticava a secao pra 5 telas; 22vh mantem a
+       pilha continua e a secao em ~3, sem virar troca de slide. */
+    margin-bottom: 22vh;
+  }
+  .mv-stack-card:last-child {
+    margin-bottom: 0;
+  }
+
+  .mv-stack-inner {
+    transform-origin: 50% 0%;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  }
+
+  /* Encolhe conforme e soterrado. animation-range em "cover" e nao "exit":
+     view-timeline usa a posicao de LAYOUT do elemento, ignorando o
+     deslocamento do sticky, entao o progresso avanca mesmo com o card
+     visualmente parado no topo. E o que da o efeito de afundar na pilha. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .mv-stack-inner {
+        animation: mv-stack-afunda linear both;
+        animation-timeline: view();
+        animation-range: cover 42% cover 100%;
+        will-change: transform;
+      }
+    }
+  }
+
+  @keyframes mv-stack-afunda {
+    to {
+      transform: scale(0.9);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .mv-stack-card {
+      top: calc(4.5rem + var(--i) * 10px);
+      margin-bottom: 16vh;
+    }
+  }
+</style>

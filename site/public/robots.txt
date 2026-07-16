@@ -1,0 +1,27 @@
+User-agent: *
+Allow: /
+
+# Motores de resposta / GEO: liberados de proposito.
+# A secao da ACC e a tabela do Anexo I sao o ativo citavel da marca, e ser
+# citado como fonte em AI Overview/ChatGPT/Perplexity e exatamente a tese:
+# num mercado que opera entre a omissao e a fraude, quem responde a pergunta
+# ganha a busca.
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://nattanlima.github.io/lp-movvin/sitemap-index.xml

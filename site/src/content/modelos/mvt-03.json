@@ -1,0 +1,31 @@
+{
+  "codigo": "MVT-03",
+  "nome": "MVT-03",
+  "categoria": "triciclo",
+  "categoriaLabel": "Triciclo elétrico",
+  "ordem": 5,
+  "triade": [
+    "TRÊS RODAS",
+    "DE APOIO",
+    "100% ELÉTRICO."
+  ],
+  "chamada": "Três rodas, mais apoio.",
+  "potenciaW": 1000,
+  "velocidadeMaximaKmh": 35,
+  "rodas": 3,
+  "oQueE": "Banco largo com encosto, apoio de braço e cesto de carga. Três rodas dão apoio permanente na parada.",
+  "beneficios": [
+    "Três rodas: apoio permanente quando para",
+    "Banco largo com encosto e apoio de braço",
+    "Cesto de carga: cabe a compra do mês"
+  ],
+  "usos": [
+    "apoio",
+    "dia-a-dia"
+  ],
+  "imagem": "/img/mvt-03",
+  "imagemAlt": "MVT-03: triciclo elétrico preto com três rodas, banco largo com encosto e apoios de braço, e cesto de carga na frente",
+  "largura": 900,
+  "altura": 696,
+  "publicado": true
+}

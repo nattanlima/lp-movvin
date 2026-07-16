@@ -1,0 +1,99 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../lib/site';
+
+/* ============================================================================
+ * POLITICA DE PRIVACIDADE
+ * ----------------------------------------------------------------------------
+ * O rodape linka /privacidade. Sem esta pagina, 404.
+ *
+ * >>> ISTO NAO E PECA JURIDICA <<<
+ * E a descricao HONESTA do que o site faz hoje, escrita por quem construiu o
+ * site: nao coleta nada, nao tem cookie, nao tem analytics, e o unico dado que
+ * sai daqui e o que o proprio visitante digita no WhatsApp.
+ * Ela e util e verdadeira, mas NAO substitui revisao de advogado. No dia em
+ * que o formulario de /revendedor tiver endpoint, ou entrar analytics, ou
+ * entrar pixel, esta pagina muda e precisa de parecer.
+ * ========================================================================== */
+
+const atualizada = '16 de julho de 2026';
+---
+
+<Base
+  titulo="Política de privacidade | Movvin"
+  descricao="O que a Movvin coleta neste site: nada. Sem cookies, sem rastreadores, sem cadastro."
+  path="/privacidade"
+>
+  <Header />
+  <main>
+    <section class="mv-section">
+      <div class="mv-container">
+        <p class="mv-eyebrow">Privacidade.</p>
+        <h1 class="mv-display mv-h2 mt-6 max-w-[16ch] text-mv-text-1">
+          A gente não <span class="text-mv-green-500">coleta nada.</span>
+        </h1>
+
+        <div class="mt-10 max-w-[58ch] space-y-8 text-mv-text-2">
+          <div>
+            <h2 class="font-display text-lg font-bold text-mv-text-1">O que este site coleta</h2>
+            <p class="mt-3 leading-relaxed">
+              Nada. Este site é um conjunto de páginas estáticas. Não há cadastro, não há login, não há cookie,
+              não há pixel de rede social e não há ferramenta de analytics. Você navega aqui sem deixar rastro
+              conosco.
+            </p>
+          </div>
+
+          <div>
+            <h2 class="font-display text-lg font-bold text-mv-text-1">O botão do WhatsApp</h2>
+            <p class="mt-3 leading-relaxed">
+              Os botões "Falar no WhatsApp" abrem uma conversa com uma mensagem já escrita, que menciona o modelo
+              ou o uso que você estava vendo. A partir do momento em que você envia, valem os termos do WhatsApp
+              e o dado que você compartilha é o que você mesmo digitou. Nós usamos essa conversa para te
+              atender, e nada além disso.
+            </p>
+          </div>
+
+          <div>
+            <h2 class="font-display text-lg font-bold text-mv-text-1">Hospedagem</h2>
+            <p class="mt-3 leading-relaxed">
+              O site é servido por um provedor de hospedagem estática, que registra requisições de acesso (como
+              endereço IP e navegador) para operar a infraestrutura. Esse registro é do provedor, é padrão da
+              internet e nós não o usamos para identificar você.
+            </p>
+          </div>
+
+          <div>
+            <h2 class="font-display text-lg font-bold text-mv-text-1">Imagens geradas por IA</h2>
+            <p class="mt-3 leading-relaxed">
+              As fotos e os vídeos de pessoas neste site são ilustrativos e foram gerados por inteligência
+              artificial. Não retratam clientes reais e não usam a imagem de nenhuma pessoa existente.
+            </p>
+          </div>
+
+          <div>
+            <h2 class="font-display text-lg font-bold text-mv-text-1">Seus direitos</h2>
+            <p class="mt-3 leading-relaxed">
+              A LGPD (Lei 13.709/2018) garante que você peça acesso, correção ou exclusão dos seus dados. Como o
+              site não coleta nada, o que existe é o histórico da conversa que você iniciou. Para pedir a
+              exclusão, fale com a gente pelos canais abaixo.
+            </p>
+          </div>
+
+          <div>
+            <h2 class="font-display text-lg font-bold text-mv-text-1">Quem responde por isso</h2>
+            <p class="mv-nums mt-3 leading-relaxed">
+              {site.razaoSocial}<br />
+              CNPJ {site.cnpj}<br />
+              {site.endereco}, {site.cidade}/{site.uf}
+            </p>
+          </div>
+        </div>
+
+        <p class="mv-nums mt-12 text-sm text-mv-text-3">Última atualização: {atualizada}.</p>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Base>

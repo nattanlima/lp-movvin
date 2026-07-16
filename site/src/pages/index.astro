@@ -1,0 +1,133 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Grid from '../components/Grid.astro';
+import Onda from '../components/Onda.astro';
+import Trabalho from '../components/Trabalho.astro';
+import Beneficios from '../components/Beneficios.astro';
+import Apoio from '../components/Apoio.astro';
+import Escola from '../components/Escola.astro';
+import Faq from '../components/Faq.astro';
+import Revendedor from '../components/Revendedor.astro';
+import Footer from '../components/Footer.astro';
+import { norma, site } from '../lib/site';
+import { getCollection } from 'astro:content';
+
+const modelos = (await getCollection('modelos', ({ data }) => data.publicado)).sort(
+  (a, b) => a.data.ordem - b.data.ordem,
+);
+
+/* ---- FAQPage: o ativo de GEO/AEO ------------------------------------------
+   Perguntas de PRODUTO, nao de lei. Motores de resposta (AI Overviews,
+   ChatGPT, Perplexity) citam quem responde direto e concreto.
+   Nenhuma pergunta sobre CNH ou IPVA: a pagina nao discute habilitacao, e
+   marcar como FAQ uma resposta que a pagina nao da e spam de dado estruturado.
+   Sem Product/Offer: sem preco confirmado, Offer seria dado estruturado falso. */
+const faq = {
+  '@type': 'FAQPage',
+  '@id': `${site.dominio}/#faq`,
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'Como funciona a nomenclatura dos modelos Movvin?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Todo modelo começa com MV, de Movvin, e a letra seguinte indica a categoria: B de bike, S de scooter e T de triciclo. O número é o sequencial dentro da categoria. Por exemplo: MVB-01 é a primeira bike, MVS-02 é a segunda scooter e MVT-03 é o triciclo.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Onde eu carrego uma Movvin?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Na tomada comum de casa. Não precisa de posto, de instalação especial nem de carregador de parede. O combustível vira conta de luz.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'O que uma Movvin precisa de manutenção?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Muito menos que um veículo a combustão. Motor elétrico não tem óleo para trocar, nem correia, nem vela, nem embreagem. A manutenção se concentra em freios, pneus e bateria.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'O que é o painel LCD com NFC?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'O painel LCD mostra velocidade e nível de carga na tela. O NFC liga o veículo por aproximação, sem chave: você encosta a tag e ela destrava.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Qual a diferença entre a bike, a scooter e o triciclo da Movvin?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'A bike (MVB) é a mais leve e discreta, com quadro baixo e cesto, para trajeto curto de bairro. A scooter (MVS) tem carenagem e é mais robusta, para uso contínuo e dia inteiro na rua. O triciclo (MVT) tem três rodas, banco largo com encosto e apoio de braço, oferecendo apoio permanente quando para.',
+      },
+    },
+  ],
+};
+
+const breadcrumb = {
+  '@type': 'BreadcrumbList',
+  itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Início', item: site.dominio }],
+};
+
+/* ItemList dos modelos: sem Offer, porque nao ha preco confirmado. */
+const listaModelos = {
+  '@type': 'ItemList',
+  name: 'Linha Movvin',
+  numberOfItems: modelos.length,
+  itemListElement: modelos.map((m, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    item: {
+      '@type': 'Product',
+      name: m.data.codigo,
+      description: m.data.oQueE,
+      image: `${site.dominio}${m.data.imagem}.png`,
+      brand: { '@id': `${site.dominio}/#organization` },
+      category: m.data.categoria,
+    },
+  })),
+};
+---
+
+{/* Title com o termo de busca na frente, marca atras: ninguem busca "Movvin"
+    ainda. Quem procura o produto busca "bike eletrica", "scooter eletrica",
+    "triciclo eletrico". A descricao carrega os termos da consulta e o
+    beneficio, nao o slogan. */}
+<Base
+  titulo="Bike, scooter e triciclo elétrico | Movvin"
+  descricao="Bikes, scooters e triciclos 100% elétricos. Carrega na tomada de casa, sem combustível e sem barulho. Painel LCD e NFC. Conheça a linha Movvin e fale com a gente no WhatsApp."
+  path="/"
+  jsonLd={[faq, breadcrumb, listaModelos]}
+>
+  <Header />
+  <main>
+    <Hero />
+    <Grid />
+
+    {/* A ONDA: acontece UMA vez, aqui. Daqui para baixo, a pagina e dia. */}
+    <Onda para="var(--color-mv-surface-1)" />
+
+    {/* As 3 faixas de video alternam o lado do texto (esq / dir / esq) para
+        nao virar zigzag monotono, e o bloco de beneficios entra no meio como
+        respiro: 3 faixas seguidas de video cansam e pesam. */}
+    <Trabalho />
+    <Apoio />
+    <Beneficios />
+    <Escola />
+
+    {/* Revendedor antes do FAQ: a faixa lima fecha a conversa B2C e o FAQ
+        vira a ultima coisa da pagina, terminando em "Como eu compro?" com o
+        CTA do WhatsApp. Quem rola ate o fim sai com a resposta e o botao. */}
+    <Revendedor />
+
+    <Faq />
+  </main>
+  <Footer />
+</Base>

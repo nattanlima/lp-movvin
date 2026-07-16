@@ -1,0 +1,74 @@
+---
+import FaixaVideo from './FaixaVideo.astro';
+import { linkWhatsApp } from '../lib/site';
+
+/* ============================================================================
+ * ESCOLA · a quarta faixa, e a que fechava o seletor
+ * ----------------------------------------------------------------------------
+ * O seletor oferece 4 usos; so 2 tinham bloco. Sem este, "Ir pra escola"
+ * filtrava o grid e mandava o visitante pra lugar nenhum.
+ *
+ * Footage: mvs-02.mp4, mae numa MVS-02 VERMELHA (o modelo real, identico ao
+ * mvs-02.png) buscando o filho na Escola Municipal. Video, produto e uso batem.
+ *
+ * O recorte e t=4..8: a cena da escola. Ficaram DE FORA de proposito os
+ * ultimos segundos, em que ela roda numa rodovia rural. Bike eletrica em via
+ * de transito rapido nao vai pra peca comercial.
+ * ========================================================================== */
+---
+
+<FaixaVideo
+  id="escola"
+  video="escola"
+  lado="esquerda"
+  cena="Uma mãe estaciona a scooter elétrica vermelha em frente ao portão de uma escola municipal e coloca o capacete no filho."
+>
+  <p class="mv-eyebrow">Pra levar e buscar.</p>
+
+  <h2 class="mv-display mv-h2 mt-4 text-mv-text-1">
+    <span class="block">Correria, né?</span>
+    <span class="block text-mv-green-500">Não precisa ser.</span>
+  </h2>
+
+  <p class="mt-6 text-xl leading-relaxed text-mv-text-1 sm:text-2xl">
+    Sai da escola, passa no mercado, volta pra casa. Sem trocar de condução.
+  </p>
+
+  <p class="mt-4 max-w-[46ch] leading-relaxed text-mv-text-2">
+    O trajeto de todo dia é curto e é sempre o mesmo. É exatamente onde a elétrica ganha do carro na vaga, do ônibus
+    no horário e da moto no custo.
+  </p>
+
+  <ul class="mt-9 space-y-3.5">
+    {
+      [
+        'Estaciona no portão da escola, não a três quarteirões.',
+        'Cesto na frente: mochila, compra, o que precisar.',
+        'Carrega em casa: nunca falta no dia que você tá atrasado.',
+      ].map((p) => (
+        <li class="flex gap-3 text-mv-text-1">
+          <span aria-hidden="true" class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-mv-green-500" />
+          <span class="leading-relaxed">{p}</span>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="mt-9 flex flex-wrap gap-3">
+    <a
+      href={linkWhatsApp({ tipo: 'uso', uso: 'escola' })}
+      class="mv-btn mv-btn-primary"
+      data-mv-event="whatsapp"
+      data-mv-valor="escola"
+      rel="nofollow"
+    >
+      Falar no WhatsApp
+    </a>
+    {/* Aponta para a MVS-02, que e o modelo que aparece no proprio video. */}
+    <a href="#modelo-mvs-02" class="mv-btn mv-btn-ghost" data-mv-event="ancora" data-mv-valor="MVS-02">
+      Ver a MVS-02
+    </a>
+  </div>
+  {/* A advertencia sobre transporte de crianca saiu daqui por decisao do
+      cliente e foi para o paragrafo unico do rodape (ver Footer.astro). */}
+</FaixaVideo>

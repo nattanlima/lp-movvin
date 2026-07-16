@@ -1,0 +1,72 @@
+---
+import FaixaVideo from './FaixaVideo.astro';
+import { linkWhatsApp } from '../lib/site';
+
+/* ============================================================================
+ * TRABALHO · foco em quem trabalha, nao no aluguel
+ * ----------------------------------------------------------------------------
+ * O angulo mudou por pedido do cliente. "Aluguel, ne?" amarrava a marca a um
+ * numero que ela nao controla (a mensalidade do concorrente) e falava de um
+ * inimigo, nao do cliente. Agora o eixo e a jornada: quem trabalha rodando
+ * gasta com combustivel todo dia, e combustivel e a unica despesa que some
+ * inteira com eletrico. Isso e verdade sem precisar de nenhum numero.
+ *
+ * NAO ESTA ESCRITO AQUI, E E PROPOSITAL: autonomia em km, custo por km,
+ * "economize R$ X", entregas por carga. Nenhum numero sem ficha tecnica
+ * assinada: uma projecao exibida em tela vincula pelo art. 30 do CDC.
+ * ========================================================================== */
+---
+
+<FaixaVideo
+  id="trabalho"
+  video="trabalho"
+  lado="esquerda"
+  cena="Um entregador com bag nas costas atravessa uma avenida da cidade em uma bike elétrica."
+>
+  <p class="mv-eyebrow">Pra trabalhar.</p>
+
+  <h2 class="mv-display mv-h2 mt-4 text-mv-text-1">
+    <span class="block">Gasolina, né?</span>
+    <span class="block text-mv-green-500">Não precisa ser.</span>
+  </h2>
+
+  <p class="mt-6 text-xl leading-relaxed text-mv-text-1 sm:text-2xl">
+    Você roda o dia inteiro pra ganhar o dia. Metade não pode ficar no posto.
+  </p>
+
+  <p class="mt-4 max-w-[46ch] leading-relaxed text-mv-text-2">
+    Elétrica carrega na tomada enquanto você dorme. Você começa o turno com o tanque cheio todo dia, e nunca mais
+    para na fila do posto no meio da corrida.
+  </p>
+
+  {/* 3 provas. Sao as UNICAS coisas que este bloco afirma. */}
+  <ul class="mt-9 space-y-3.5">
+    {
+      [
+        'Carrega na tomada comum: sem posto, sem fila.',
+        'Sem óleo, sem correia, sem vela: menos dia parado na oficina.',
+        'Silenciosa: entrega de madrugada sem acordar ninguém.',
+      ].map((p) => (
+        <li class="flex gap-3 text-mv-text-1">
+          <span aria-hidden="true" class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-mv-green-500" />
+          <span class="leading-relaxed">{p}</span>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="mt-9 flex flex-wrap gap-3">
+    <a
+      href={linkWhatsApp({ tipo: 'uso', uso: 'trabalho' })}
+      class="mv-btn mv-btn-primary"
+      data-mv-event="whatsapp"
+      data-mv-valor="trabalho"
+      rel="nofollow"
+    >
+      Falar no WhatsApp
+    </a>
+    <a href="#modelo-mvs-02" class="mv-btn mv-btn-ghost" data-mv-event="ancora" data-mv-valor="MVS-02">
+      Ver a MVS-02
+    </a>
+  </div>
+</FaixaVideo>

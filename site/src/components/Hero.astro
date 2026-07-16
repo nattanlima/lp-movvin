@@ -1,0 +1,279 @@
+---
+import Rings from './Rings.astro';
+import ShapeBlur from './ShapeBlur.astro';
+import { linkWhatsApp } from '../lib/site';
+import { asset } from '../lib/url';
+
+/* ============================================================================
+ * HERO
+ * ----------------------------------------------------------------------------
+ * Estrutura da referencia (Radian EXR): produto de frente ocupando a tela
+ * inteira, aneis atras, textos SOBREPOSTOS ao produto no rodape.
+ *
+ * O produto e a MVS-01 — o arquivo chegou nomeado "mvb-03-front" mas a
+ * carenagem diz MVS-01 e a foto bate com o mvs-01.png (prata + laranja).
+ *
+ * PARALLAX: por profundidade, nao por enfeite. Quem esta mais longe LAGA MAIS
+ * (translateY maior = fica pra tras do scroll). Entao: aneis (fundo) > moto
+ * (meio) > texto (rola normal). Feito com scroll-driven animation nativa, sem
+ * lib e sem listener de scroll. Sem suporte, a pagina fica estatica e correta.
+ *
+ * ALTURA: a imagem preenche a altura do hero e transborda na largura quando
+ * precisa. Nao ha max-h fixo: em tela baixa e larga a moto encolhe pela
+ * altura, e o guidao e que sai de quadro — nunca o farol, que e o centro
+ * otico da foto.
+ * ========================================================================== */
+
+const ROTATIVAS = ['Pesado, né?', 'Caro, né?', 'Parado, né?', 'Longe, né?'];
+---
+
+{/* >>> DUAS ESTRUTURAS, E O MOTIVO E MEDIDO <<<
+    DESKTOP: o texto flutua SOBRE a moto, como na referencia. Sobra largura,
+    entao o texto vive na esquerda e a moto no centro: nao se encostam.
+    CELULAR: o texto vem DEPOIS da moto, em fluxo normal. Numa coluna de 390px
+    o texto caia bem em cima do farol de LED, e farol e o ponto mais claro da
+    foto: medi 1,04:1 na linha branca e 1,16:1 na lima (o minimo e 3:1).
+    E nenhum scrim salvava, porque o texto e o farol ocupam a MESMA altura:
+    escurecer o suficiente pro texto existir apagaria o farol, que e a unica
+    coisa na foto que diz "ligada". Empilhar e o que resolve. */}
+<section
+  class="mv-hero relative isolate flex min-h-[calc(100svh-4rem)] flex-col overflow-hidden sm:block sm:h-[calc(100svh-5rem)]"
+  id="conteudo"
+>
+  {/* ---- Fundo: aneis. Lagam mais que a moto = leem como mais longe. --- */}
+  <div
+    class="mv-par-rings pointer-events-none absolute inset-x-0 top-[-10%] h-[120%]"
+    style="mask-image: radial-gradient(ellipse 78% 64% at 50% 44%, #000 40%, transparent 80%); -webkit-mask-image: radial-gradient(ellipse 78% 64% at 50% 44%, #000 40%, transparent 80%);"
+  >
+    <Rings />
+  </div>
+
+  {/* ---- Halo do farol: a moto esta com o LED aceso na foto ------------ */}
+  <div
+    aria-hidden="true"
+    class="mv-par-moto pointer-events-none absolute top-[58%] left-1/2 h-[38vh] max-h-[340px] w-[38vh] max-w-[340px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-25 blur-[80px]"
+    style="background: radial-gradient(circle, #ffffff 0%, transparent 62%);"
+  >
+  </div>
+
+  {/* ---- O produto ----------------------------------------------------
+       Celular: item de fluxo, no topo. Desktop: absoluto, ocupando a altura
+       toda do hero. */}
+  <div class="mv-par-moto relative flex shrink-0 items-start justify-center sm:absolute sm:inset-0">
+    <picture class="contents">
+      <source srcset={asset("/img/mvs-01-front.avif")} type="image/avif" />
+      <source srcset={asset("/img/mvs-01-front.webp")} type="image/webp" />
+      {/* CELULAR: a moto CABE na largura e ocupa o topo, deixando a metade de
+          baixo pro texto. Antes era h-full w-auto tambem aqui: numa tela de
+          390px a imagem virava 763px de largura, estourava, e a headline caia
+          no meio da carenagem prata (1,25:1, ilegivel). Nao era o scrim que
+          estava fraco: era a moto grande demais pra tela.
+          A partir de sm ela volta a preencher a altura, que e onde o formato
+          da referencia funciona. */}
+      <img
+        src={asset("/img/mvs-01-front.png")}
+        alt="MVS-01 de frente: scooter elétrica prata com detalhes laranja, guidão largo e faróis de LED acesos"
+        width="1369"
+        height="1400"
+        fetchpriority="high"
+        decoding="async"
+        class="mt-2 h-auto w-full max-w-[84%] object-contain object-top sm:mt-0 sm:h-full sm:w-auto sm:max-w-none"
+        style="filter: drop-shadow(0 30px 70px rgba(0,0,0,0.75));"
+      />
+    </picture>
+  </div>
+
+  {/* ---- Scrim DIRECIONAL -----------------------------------------------
+       Um scrim chapado no rodape apagava o farol, que e o centro otico da
+       foto e a unica coisa que diz "ligada". Aqui sao dois: um de baixo,
+       fraco, so pra costurar com a secao seguinte; e um da direita, forte,
+       exatamente onde o texto mora. O farol fica no meio, fora dos dois. */}
+  {/* >>> NAO PONHA sm: NESTES DOIS <<<
+       O scrim da esquerda era hidden sm:block, ou seja: sumia exatamente no
+       celular, que e onde o texto MAIS precisa dele. Sem ele o h1 lima caia em
+       cima da carenagem prata da moto e dava 1,25:1 (o minimo e 4,5:1).
+       No celular o texto ocupa a largura toda, entao o scrim tambem: aqui ele
+       e vertical e cobre a base inteira. A partir de sm ele vira radial e
+       recua pra esquerda, liberando o farol no centro. */}
+  <div
+    aria-hidden="true"
+    class="pointer-events-none absolute inset-x-0 bottom-0 h-[58%] sm:h-[40%]"
+    style="background: linear-gradient(to top, var(--color-mv-bg) 0%, color-mix(in srgb, var(--color-mv-bg) 88%, transparent) 34%, color-mix(in srgb, var(--color-mv-bg) 40%, transparent) 62%, transparent 100%);"
+  >
+  </div>
+  <div
+    aria-hidden="true"
+    class="pointer-events-none absolute bottom-0 left-0 hidden h-[76%] w-[64%] sm:block"
+    style="background: radial-gradient(ellipse 84% 78% at 8% 88%, var(--color-mv-bg) 6%, color-mix(in srgb, var(--color-mv-bg) 74%, transparent) 46%, transparent 78%);"
+  >
+  </div>
+
+  {/* ---- Os textos ----------------------------------------------------
+       Celular: fluxo, DEPOIS da moto (mt-auto empurra pro rodape do hero).
+       Desktop: absolutos, sobrepostos ao produto. */}
+  <div class="mv-container relative mt-auto pt-8 pb-8 sm:absolute sm:inset-x-0 sm:bottom-0 sm:mt-0 sm:pt-0 sm:pb-12">
+    <div class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+      <div class="order-1 max-w-[38rem]">
+        <p class="mv-eyebrow">Silenciosa. Inteligente. 100% elétrica.</p>
+
+        <h1 class="mv-display mv-h1 mt-3 text-mv-text-1">
+          <span data-mv-rotativo data-palavras={ROTATIVAS.join('|')} class="mv-rot block">{ROTATIVAS[0]}</span>
+          <span class="block text-mv-green-500">Não precisa ser.</span>
+        </h1>
+
+        <p class="mt-4 max-w-[42ch] text-base leading-relaxed text-mv-text-2 sm:text-lg">
+          A revolução elétrica do seu dia a dia. Sem combustível, sem barulho, sem passar no posto.
+        </p>
+
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a href="#linha" class="mv-btn mv-btn-ghost group gap-2.5" data-mv-event="cta-hero" data-mv-valor="linha">
+            Conheça a linha
+            <span
+              aria-hidden="true"
+              class="flex h-6 w-6 items-center justify-center rounded-full border border-current text-xs transition-transform duration-300 group-hover:translate-x-0.5"
+              style="transition-timing-function: var(--ease-mv);">→</span
+            >
+          </a>
+          <a
+            href={linkWhatsApp({ tipo: 'geral' })}
+            class="mv-btn mv-btn-primary group gap-2.5"
+            data-mv-event="whatsapp"
+            data-mv-valor="hero"
+            rel="nofollow"
+          >
+            Falar no WhatsApp
+            <span
+              aria-hidden="true"
+              class="flex h-6 w-6 items-center justify-center rounded-full border border-mv-bg/35 text-xs transition-transform duration-300 group-hover:translate-x-0.5"
+              style="transition-timing-function: var(--ease-mv);">→</span
+            >
+          </a>
+        </div>
+      </div>
+
+      {/* Cartao do modelo em cena, a direita — o lado oposto ao texto, como
+          na referencia. O ShapeBlur acende a borda por onde o cursor passa:
+          e o unico ponto da pagina que reage ao ponteiro sem ser um controle,
+          e serve pra dizer "isto aqui e clicavel" antes do hover chegar. */}
+      {/* SEM overflow-hidden: era ele que cortava o brilho exatamente na
+          aresta e fazia o efeito existir so pra dentro. O canvas do ShapeBlur
+          extrapola o cartao pela sangria, entao qualquer clip no caminho mata
+          o vazamento. O raio aqui e 16px (rounded-2xl) e e o mesmo numero
+          passado pro shader: se um mudar, o outro muda junto. */}
+      <a
+        href="#modelo-mvs-01"
+        class="group relative order-2 hidden rounded-2xl border border-mv-border bg-mv-surface-1/70 p-4 backdrop-blur-sm transition-colors duration-300 hover:border-mv-green-500/50 sm:block"
+        data-mv-event="ancora"
+        data-mv-valor="MVS-01"
+      >
+        <ShapeBlur class="-z-10" sangria={48} raio={16} espessura={1.5} halo={22} alcance={165} />
+        <p class="font-display text-xl font-black text-mv-text-1" translate="no">MVS-01</p>
+        <p class="mt-0.5 text-xs text-mv-text-3">Scooter elétrica</p>
+        <dl class="mv-nums mt-3 flex gap-2">
+          <div class="rounded-lg bg-mv-surface-2 px-3 py-1.5">
+            <dt class="text-[0.6rem] font-bold tracking-wider text-mv-text-3 uppercase">Motor</dt>
+            <dd class="font-display text-sm font-black text-mv-text-1">1.000&nbsp;W</dd>
+          </div>
+          <div class="rounded-lg bg-mv-surface-2 px-3 py-1.5">
+            <dt class="text-[0.6rem] font-bold tracking-wider text-mv-text-3 uppercase">Velocidade</dt>
+            <dd class="font-display text-sm font-black text-mv-text-1">35&nbsp;km/h</dd>
+          </div>
+        </dl>
+        <p class="mt-3 text-xs font-semibold text-mv-green-500">
+          Ver a ficha
+          <span aria-hidden="true" class="inline-block transition-transform duration-300 group-hover:translate-x-0.5"
+            >→</span
+          >
+        </p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  /* Headline rotativa. Roda a FRASE inteira: as palavras tem larguras muito
+     diferentes e trocar so o adjetivo faz o ", né?" pular a cada volta. */
+  (() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const rot = document.querySelector('[data-mv-rotativo]');
+    if (!rot) return;
+    const frases = (rot.dataset.palavras || '').split('|').filter(Boolean);
+    if (frases.length < 2) return;
+    let i = 0;
+    setInterval(() => {
+      rot.setAttribute('data-saindo', '');
+      setTimeout(() => {
+        i = (i + 1) % frases.length;
+        rot.textContent = frases[i];
+        rot.removeAttribute('data-saindo');
+      }, 320);
+    }, 2800);
+  })();
+</script>
+
+<style>
+  .mv-rot {
+    transition:
+      opacity 300ms var(--ease-mv),
+      transform 300ms var(--ease-mv);
+  }
+  .mv-rot[data-saindo] {
+    opacity: 0;
+    transform: translateY(-0.14em);
+  }
+
+  /* --- PARALLAX ----------------------------------------------------------
+     scroll-driven animation nativa: sem lib, sem listener, roda no compositor.
+     translateY positivo = o elemento fica pra tras do scroll = parece longe.
+     Quem esta mais fundo laga mais: aneis 22% > moto 11% > texto 0%. */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .mv-par-rings,
+      .mv-par-moto {
+        animation: linear both;
+        animation-timeline: scroll(root block);
+        animation-range: 0 100svh;
+        will-change: transform;
+      }
+      .mv-par-rings {
+        animation-name: mv-par-fundo;
+      }
+      .mv-par-moto {
+        animation-name: mv-par-meio;
+      }
+    }
+  }
+
+  @keyframes mv-par-fundo {
+    to {
+      transform: translateY(22%) scale(1.06);
+      opacity: 0.35;
+    }
+  }
+
+  @keyframes mv-par-meio {
+    to {
+      transform: translateY(11%) scale(1.05);
+    }
+  }
+
+  /* O halo do farol ja nasce com -translate-x-1/2 -translate-y-1/2: um
+     keyframe de transform apagaria o centramento. Aqui ele so acompanha. */
+  .mv-par-moto[style*='radial-gradient'] {
+    animation-name: mv-par-halo;
+  }
+  @keyframes mv-par-halo {
+    from {
+      transform: translate(-50%, -50%);
+    }
+    to {
+      transform: translate(-50%, calc(-50% + 11svh));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mv-rot {
+      transition: none;
+    }
+  }
+</style>

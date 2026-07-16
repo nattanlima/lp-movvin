@@ -1,0 +1,102 @@
+---
+import MagnetLines from './MagnetLines.astro';
+
+/* ============================================================================
+ * BENEFICIOS · a faixa lima
+ * ----------------------------------------------------------------------------
+ * Fundo na cor da marca com a grade do magnet-lines em preto por tras.
+ *
+ * >>> A INVERSAO E OBRIGATORIA, NAO ESTETICA <<<
+ * Sobre o lima, TODO texto vira escuro. Branco sobre #C8F13F da 1,30:1 e
+ * reprova ate AA-large; #0A0A0A sobre #C8F13F da 15,19:1. Nao existe versao
+ * "clarinha" desta secao: se alguem trocar o texto pra branco aqui, a secao
+ * fica ilegivel. Mesma regra que ja vale na faixa do revendedor.
+ * O anel de foco tambem inverte (--mv-focus), senao some no proprio fundo.
+ *
+ * Degrade nas costuras: as duas vizinhas (Apoio e Escola) sao faixas escuras
+ * de video. Um corte reto do escuro pro lima chapado bate como erro de
+ * render. As duas bordas derretem.
+ *
+ * A grade fica atras do conteudo mas NAO recebe ponteiro (pointer-events:
+ * none no componente): ela reage ao cursor em qualquer lugar da secao, e os
+ * links continuam clicaveis.
+ * ========================================================================== */
+
+const ITENS = [
+  {
+    t: 'Sem posto, sem combustível',
+    d: 'Carrega na tomada comum de casa. O combustível vira conta de luz, e a diferença você sente no fim do mês.',
+  },
+  {
+    t: 'Silenciosa de verdade',
+    d: 'Motor elétrico não faz barulho e não vibra. Sai de casa cedo sem acordar ninguém.',
+  },
+  {
+    t: 'Quase nada pra manter',
+    d: 'Sem óleo, sem correia, sem vela, sem embreagem. Motor elétrico tem menos peça pra quebrar.',
+  },
+  {
+    t: 'Painel LCD e NFC',
+    d: 'Velocidade e carga na tela. Liga por aproximação, sem chave pra perder.',
+  },
+];
+---
+
+<section
+  id="beneficios"
+  class="relative isolate scroll-mt-20 overflow-hidden bg-mv-green-500 text-mv-bg"
+  style="--mv-focus: var(--color-mv-bg);"
+>
+  {/* A grade de limalha, em preto, cobrindo a faixa inteira.
+      A MASCARA nao e enfeite: sem ela os tracos correm por DENTRO das letras
+      do texto corrido, e o corpo em preto/80 sobre lima com risco preto
+      atravessando vira ruido. Aqui a grade abre um respiro na coluna do texto
+      (que e a esquerda) e volta a cheia no resto da faixa. */}
+  <MagnetLines
+    class="mv-magnet-mask absolute inset-0 -z-10 opacity-[0.22]"
+    rows={9}
+    columns={22}
+    lineColor="var(--color-mv-bg)"
+    lineWidth="2px"
+    lineHeight="clamp(26px, 3.4vw, 46px)"
+    baseAngle={-10}
+  />
+
+  {/* CORTE RETO, sem degrade nas bordas. Padronizacao deliberada:
+      a pagina so tem DUAS transicoes escuro->lima (aqui e no Revendedor) e
+      elas estavam tratadas de formas diferentes. Agora as duas cortam reto.
+      A ONDA em S continua sendo a UNICA excecao, e e o que a mantem como
+      assinatura: se toda costura tivesse tratamento, ela deixaria de ser um
+      gesto e viraria padrao de secao.
+      Motivo do corte e nao do degrade: as pecas da propria marca tem aresta
+      dura entre preto e lima, e o degrade sobre a grade de linhas fazia os
+      tracos desbotarem num meio-termo sujo em vez de sumirem na borda. */}
+
+  {/* Mais alta: a faixa respira e o efeito tem espaco pra existir. */}
+  <div class="mv-container relative flex min-h-[86svh] flex-col justify-center py-28 sm:py-36">
+    <div class="mv-reveal max-w-[42ch]">
+      <p class="font-display text-xs font-bold tracking-[0.14em] text-mv-bg/70 uppercase">Sem combustível.</p>
+
+      {/* O segundo tom e green-900, nao preto transparente: preto a 45% sobre
+          o lima da 3,02:1 (so raspa AA-large) e le como oliva lavado.
+          #3F4C14 da 7,14:1, passa AAA e e da mesma familia de hue da marca. */}
+      <h2 class="mv-display mv-h2 mt-4 text-mv-bg">
+        Vá <span class="text-mv-green-900">além.</span>
+      </h2>
+
+      <p class="mt-6 text-xl leading-relaxed text-mv-bg/80 sm:text-2xl">Menos limites, mais possibilidades.</p>
+    </div>
+
+    {/* 4 celulas para 4 beneficios. Nem uma 5a vazia, nem um "e muito mais". */}
+    <ul class="mv-reveal mt-16 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:mt-20 lg:grid-cols-4">
+      {
+        ITENS.map((i) => (
+          <li class="border-t-2 border-mv-bg/25 pt-5">
+            <h3 class="font-display text-lg leading-tight font-bold text-mv-bg">{i.t}</h3>
+            <p class="mt-2.5 text-sm leading-relaxed text-mv-bg/75">{i.d}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

@@ -1,0 +1,236 @@
+---
+/* ============================================================================
+ * MAGIC RINGS  ·  porte do componente do reactbits.dev para WebGL puro
+ * ----------------------------------------------------------------------------
+ * O original (reactbits.dev/animations/magic-rings) roda o shader via React +
+ * Three.js. Three.js sozinho pesa ~600 KB minificado, o que sozinho seria 5x
+ * a pagina inteira — inviavel num publico que acessa por 4G com franquia
+ * contada. O FRAGMENT SHADER abaixo e o mesmo do original; o que mudou foi so
+ * a plumbing: quad em clip-space e WebGL cru, ~3 KB, zero dependencia.
+ *
+ * Cores na marca: lima #C8F13F -> verde-600 #A9CC35, para o anel ganhar
+ * profundidade em vez de virar um decalque chapado.
+ *
+ * Guardas de custo, porque um shader fullscreen a 60fps num celular fraco e
+ * caro de verdade:
+ *  - so anima enquanto esta no viewport (IntersectionObserver)
+ *  - pausa quando a aba perde o foco
+ *  - DPR travado em 1.5
+ *  - prefers-reduced-motion: nao inicia, fica o fundo escuro
+ *  - sem WebGL: nao inicia, nada quebra
+ * ========================================================================== */
+
+interface Props {
+  class?: string;
+}
+const { class: klass = '' } = Astro.props;
+---
+
+<div class={`mv-rings ${klass}`} data-mv-rings aria-hidden="true"></div>
+
+<style>
+  .mv-rings {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .mv-rings :global(canvas) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 1.2s var(--ease-mv);
+  }
+  .mv-rings :global(canvas[data-pronto]) {
+    opacity: 1;
+  }
+</style>
+
+<script>
+  const FRAG = `precision highp float;
+uniform float uTime, uAttenuation, uLineThickness;
+uniform float uBaseRadius, uRadiusStep, uScaleRate;
+uniform float uOpacity, uNoiseAmount, uRotation, uRingGap;
+uniform float uFadeIn, uFadeOut;
+uniform vec2 uResolution;
+uniform vec3 uColor, uColorTwo;
+uniform int uRingCount;
+
+const float HP = 1.5707963;
+const float CYCLE = 3.45;
+
+float fade(float t) {
+  return t < uFadeIn ? smoothstep(0.0, uFadeIn, t) : 1.0 - smoothstep(uFadeOut, CYCLE - 0.2, t);
+}
+
+float ring(vec2 p, float ri, float cut, float t0, float px) {
+  float t = mod(uTime + t0, CYCLE);
+  float r = ri + t / CYCLE * uScaleRate;
+  float d = abs(length(p) - r);
+  float a = atan(abs(p.y), abs(p.x)) / HP;
+  float th = max(1.0 - a, 0.5) * px * uLineThickness;
+  float h = (1.0 - smoothstep(th, th * 1.5, d)) + 1.0;
+  d += pow(cut * a, 3.0) * r;
+  return h * exp(-uAttenuation * d) * fade(t);
+}
+
+void main() {
+  float px = 1.0 / min(uResolution.x, uResolution.y);
+  vec2 p = (gl_FragCoord.xy - 0.5 * uResolution.xy) * px;
+  float cr = cos(uRotation), sr = sin(uRotation);
+  p = mat2(cr, -sr, sr, cr) * p;
+  vec3 c = vec3(0.0);
+  float rcf = max(float(uRingCount) - 1.0, 1.0);
+  for (int i = 0; i < 10; i++) {
+    if (i >= uRingCount) break;
+    float fi = float(i);
+    vec3 rc = mix(uColor, uColorTwo, fi / rcf);
+    c = mix(c, rc, vec3(ring(p, uBaseRadius + fi * uRadiusStep, pow(uRingGap, fi), i == 0 ? 0.0 : 2.95 * fi, px)));
+  }
+  float n = fract(sin(dot(gl_FragCoord.xy + uTime * 100.0, vec2(12.9898, 78.233))) * 43758.5453);
+  c += (n - 0.5) * uNoiseAmount;
+  gl_FragColor = vec4(c, max(c.r, max(c.g, c.b)) * uOpacity);
+}`;
+
+  const VERT = `attribute vec2 aPos;
+void main() { gl_Position = vec4(aPos, 0.0, 1.0); }`;
+
+  /* Parametros afinados para o hero: aneis largos e lentos, que respiram atras
+     do produto em vez de competir com ele. */
+  const CFG = {
+    color: [0.784, 0.945, 0.247], // #C8F13F
+    colorTwo: [0.663, 0.8, 0.208], // #A9CC35
+    speed: 0.42,
+    ringCount: 5,
+    attenuation: 7.5,
+    lineThickness: 2.2,
+    baseRadius: 0.3,
+    radiusStep: 0.115,
+    scaleRate: 0.12,
+    opacity: 0.62,
+    noiseAmount: 0.045,
+    rotation: 0,
+    ringGap: 1.5,
+    fadeIn: 0.7,
+    fadeOut: 0.5,
+  };
+
+  function compilar(gl: WebGLRenderingContext, tipo: number, src: string) {
+    const s = gl.createShader(tipo)!;
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+      gl.deleteShader(s);
+      return null;
+    }
+    return s;
+  }
+
+  function iniciar(host: HTMLElement) {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl', { alpha: true, antialias: false, premultipliedAlpha: false });
+    if (!gl) return;
+
+    const vs = compilar(gl, gl.VERTEX_SHADER, VERT);
+    const fs = compilar(gl, gl.FRAGMENT_SHADER, FRAG);
+    if (!vs || !fs) return;
+
+    const prog = gl.createProgram()!;
+    gl.attachShader(prog, vs);
+    gl.attachShader(prog, fs);
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return;
+    gl.useProgram(prog);
+
+    host.appendChild(canvas);
+
+    // quad fullscreen em clip-space: dispensa matriz de projecao
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    const aPos = gl.getAttribLocation(prog, 'aPos');
+    gl.enableVertexAttribArray(aPos);
+    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+    const u = (n: string) => gl.getUniformLocation(prog, n);
+    const U = {
+      time: u('uTime'), res: u('uResolution'), color: u('uColor'), colorTwo: u('uColorTwo'),
+      atten: u('uAttenuation'), thick: u('uLineThickness'), base: u('uBaseRadius'),
+      step: u('uRadiusStep'), scale: u('uScaleRate'), count: u('uRingCount'),
+      opacity: u('uOpacity'), noise: u('uNoiseAmount'), rot: u('uRotation'),
+      gap: u('uRingGap'), fin: u('uFadeIn'), fout: u('uFadeOut'),
+    };
+
+    gl.uniform3fv(U.color, CFG.color);
+    gl.uniform3fv(U.colorTwo, CFG.colorTwo);
+    gl.uniform1f(U.atten, CFG.attenuation);
+    gl.uniform1f(U.thick, CFG.lineThickness);
+    gl.uniform1f(U.base, CFG.baseRadius);
+    gl.uniform1f(U.step, CFG.radiusStep);
+    gl.uniform1f(U.scale, CFG.scaleRate);
+    gl.uniform1i(U.count, CFG.ringCount);
+    gl.uniform1f(U.opacity, CFG.opacity);
+    gl.uniform1f(U.noise, CFG.noiseAmount);
+    gl.uniform1f(U.rot, (CFG.rotation * Math.PI) / 180);
+    gl.uniform1f(U.gap, CFG.ringGap);
+    gl.uniform1f(U.fin, CFG.fadeIn);
+    gl.uniform1f(U.fout, CFG.fadeOut);
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    const medir = () => {
+      const w = Math.max(host.clientWidth, 1);
+      const h = Math.max(host.clientHeight, 1);
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.uniform2f(U.res, canvas.width, canvas.height);
+    };
+    medir();
+    new ResizeObserver(medir).observe(host);
+
+    let raf = 0;
+    let rodando = false;
+    const desenhar = (t: number) => {
+      raf = requestAnimationFrame(desenhar);
+      gl.uniform1f(U.time, t * 0.001 * CFG.speed);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    };
+    const ligar = () => {
+      if (rodando) return;
+      rodando = true;
+      raf = requestAnimationFrame(desenhar);
+      canvas.setAttribute('data-pronto', '');
+    };
+    const desligar = () => {
+      if (!rodando) return;
+      rodando = false;
+      cancelAnimationFrame(raf);
+    };
+
+    /* So gasta GPU enquanto esta em cena E com a aba visivel.
+       O visibilitychange precisa RELIGAR, nao so desligar: antes ele so
+       chamava desligar() quando a aba escondia, e nada religava na volta.
+       Quem trocava de aba com o hero na tela voltava pra um hero morto, pra
+       sempre, ate recarregar. Guardar emCena e o que fecha o ciclo. */
+    let emCena = false;
+    new IntersectionObserver(
+      ([e]) => {
+        emCena = e.isIntersecting;
+        emCena && !document.hidden ? ligar() : desligar();
+      },
+      { threshold: 0 },
+    ).observe(host);
+    document.addEventListener('visibilitychange', () => {
+      document.hidden || !emCena ? desligar() : ligar();
+    });
+  }
+
+  const host = document.querySelector<HTMLElement>('[data-mv-rings]');
+  if (host && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    iniciar(host);
+  }
+</script>

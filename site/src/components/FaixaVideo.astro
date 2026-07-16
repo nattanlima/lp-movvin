@@ -1,0 +1,114 @@
+---
+import { site } from '../lib/site';
+import { asset } from '../lib/url';
+
+/* ============================================================================
+ * FAIXA DE VIDEO  ·  o padrao aprovado pelo cliente
+ * ----------------------------------------------------------------------------
+ * Video de fundo + tipografia por cima, full-bleed. Usado 3x (trabalho, apoio,
+ * escola), com o lado do texto ALTERNANDO para nao virar zigzag monotono.
+ *
+ * Regras que este componente carrega sozinho:
+ *  - preload="none" + IntersectionObserver: o video so baixa quando entra em
+ *    cena. Nunca acima da dobra.
+ *  - prefers-reduced-motion: fica so o poster, o video nunca da play.
+ *  - o gradiente sai do lado do texto: sem ele a tipografia branca cai em cima
+ *    de ceu claro e o contraste morre.
+ *  - aria-hidden no video: e ambiente, nao conteudo. Quem usa leitor de tela
+ *    nao ganha nada com "video de uma senhora pilotando" no meio da copy.
+ * ========================================================================== */
+
+interface Props {
+  id: string;
+  video: string; // basename em /video (sem extensao)
+  lado?: 'esquerda' | 'direita';
+  /** Descreve a cena. Vira <figcaption> visualmente oculto + title do video. */
+  cena: string;
+  class?: string;
+}
+
+const { id, video, lado = 'esquerda', cena, class: klass = '' } = Astro.props;
+const textoNaEsquerda = lado === 'esquerda';
+---
+
+<section id={id} class={`relative isolate scroll-mt-20 overflow-hidden bg-mv-surface-1 ${klass}`}>
+  {
+    site.usarVideos && (
+      <>
+        {/* O POSTER E UM <img loading="lazy">, NAO o atributo poster do video.
+            O atributo poster ignora preload="none" e baixa SEMPRE no primeiro
+            load: os 3 posters juntos (~110 KB) desciam 6 a 10 telas antes de
+            existirem na tela e roubavam ~1s do LCP em 4G. Como <img lazy>, o
+            browser so busca quando chega perto. */}
+        <img
+          src={asset(`/video/${video}-poster.webp`)}
+          alt=""
+          width="1280"
+          height="640"
+          loading="lazy"
+          decoding="async"
+          class="absolute inset-0 -z-20 h-full w-full object-cover"
+        />
+        <video
+          class="absolute inset-0 -z-20 h-full w-full object-cover"
+          preload="none"
+          muted
+          loop
+          playsinline
+          aria-hidden="true"
+          tabindex="-1"
+          data-mv-lazyvideo
+        >
+          <source src={asset(`/video/${video}.webm`)} type="video/webm" />
+          <source src={asset(`/video/${video}.mp4`)} type="video/mp4" />
+        </video>
+      </>
+    )
+  }
+
+  {/* SCRIM DO CELULAR: vertical, cobrindo a faixa inteira.
+      O gradiente horizontal abaixo foi desenhado pra 2 colunas (texto de um
+      lado, video do outro). No celular existe UMA coluna: o texto ocupa a
+      largura toda e o lado direito de cada linha caia fora do scrim, em cima
+      do video em movimento. Aqui a base e escura o suficiente pra o texto
+      existir, e o video vira textura. */}
+  <div
+    aria-hidden="true"
+    class="absolute inset-0 -z-10 sm:hidden"
+    style="background: linear-gradient(to top,
+      var(--color-mv-bg) 0%,
+      color-mix(in srgb, var(--color-mv-bg) 86%, transparent) 55%,
+      color-mix(in srgb, var(--color-mv-bg) 55%, transparent) 100%);"
+  >
+  </div>
+
+  {/* Gradiente direcional: nasce no lado do texto e morre no outro.
+      So a partir de sm, quando existem de fato duas colunas. */}
+  <div
+    aria-hidden="true"
+    class="absolute inset-0 -z-10 hidden sm:block"
+    style={`background: linear-gradient(${textoNaEsquerda ? '90deg' : '270deg'},
+      var(--color-mv-bg) 0%,
+      color-mix(in srgb, var(--color-mv-bg) 88%, transparent) 34%,
+      color-mix(in srgb, var(--color-mv-bg) 30%, transparent) 68%,
+      transparent 100%);`}
+  >
+  </div>
+  {/* Base escura no rodape da faixa: costura com a secao seguinte. */}
+  <div
+    aria-hidden="true"
+    class="absolute inset-x-0 bottom-0 -z-10 h-32"
+    style="background: linear-gradient(to top, var(--color-mv-bg) 0%, transparent 100%);"
+  >
+  </div>
+
+  <div class="mv-container mv-section">
+    <div class:list={['grid gap-8 lg:grid-cols-2', !textoNaEsquerda && 'lg:[&>*]:col-start-2']}>
+      <div class="mv-reveal max-w-[52ch]">
+        <slot />
+      </div>
+    </div>
+  </div>
+
+  <p class="sr-only">{cena}</p>
+</section>

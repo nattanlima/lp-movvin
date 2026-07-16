@@ -1,0 +1,30 @@
+{
+  "codigo": "MVS-02",
+  "nome": "MVS-02",
+  "categoria": "scooter",
+  "categoriaLabel": "Scooter elétrica",
+  "ordem": 4,
+  "triade": [
+    "ROBUSTA",
+    "DE TRABALHO",
+    "100% ELÉTRICA."
+  ],
+  "chamada": "Feita pra rodar o dia inteiro.",
+  "potenciaW": 1000,
+  "velocidadeMaximaKmh": 35,
+  "rodas": 2,
+  "oQueE": "Carenagem fechada, banco duplo e a estrutura mais robusta da linha. Aguenta o turno inteiro.",
+  "beneficios": [
+    "A mais robusta da linha: uso contínuo",
+    "Banco duplo e espaço pra bag",
+    "Custo por quilômetro que gasolina não alcança"
+  ],
+  "usos": [
+    "trabalho"
+  ],
+  "imagem": "/img/mvs-02",
+  "imagemAlt": "MVS-02: scooter elétrica vermelha de carenagem fechada, com farol integrado e banco duplo",
+  "largura": 900,
+  "altura": 718,
+  "publicado": true
+}

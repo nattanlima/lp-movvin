@@ -1,0 +1,126 @@
+---
+import { linkWhatsApp } from '../lib/site';
+import { asset } from '../lib/url';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  modelo: CollectionEntry<'modelos'>['data'];
+  indice?: number;
+}
+const { modelo: m, indice = 0 } = Astro.props;
+
+/* ANATOMIA FIXA, igual para TODO modelo: e o que impede a pagina de virar
+   4 LPs coladas. [foto][codigo + categoria][triade][chamada][o que e]
+   [2 specs heroi][beneficios][CTA]
+   As specs vao em 2 numeros grandes + pills, nunca na faixa de 5 linhas com
+   border-b repetida identica em todo card: aquele padrao mata a escada de
+   produto e nao diferencia nada. */
+---
+
+<article
+  id={`modelo-${m.codigo.toLowerCase()}`}
+  data-modelo={m.codigo}
+  style={`--mv-i: ${Math.min(indice, 5)}`}
+  class="mv-reveal mv-stagger group flex scroll-mt-24 flex-col overflow-hidden rounded-2xl border border-mv-border bg-mv-surface-1 transition-[border-color,transform] duration-300 hover:-translate-y-1 hover:border-mv-green-500/40"
+>
+  {/* bottom-align: todo PNG esta cortado rente ao ponto de contato do pneu.
+      Alinhar pela base poe todas as rodas na mesma linha de chao de graca.
+      Escalar por ALTURA, nunca por largura: os aspect-ratios divergem. */}
+  <div class="relative flex h-52 items-end justify-center overflow-hidden bg-mv-surface-2 px-6 pt-6 sm:h-60">
+    {/* Refletor: MVB-02 e MVT-03 sao pretos e encostam no fundo do card sem
+        isto. E o que faz a silhueta existir. */}
+    <div
+      aria-hidden="true"
+      class="pointer-events-none absolute inset-0"
+      style="background: radial-gradient(ellipse 64% 60% at 50% 50%,
+        color-mix(in srgb, var(--color-mv-green-500) 12%, #383d31) 0%,
+        transparent 70%);"
+    >
+    </div>
+    {/* sombra de contato na base do recorte: tira o produto do ar */}
+    <div
+      aria-hidden="true"
+      class="pointer-events-none absolute bottom-[-14px] left-1/2 h-8 w-[64%] -translate-x-1/2 rounded-[50%] bg-black/80 blur-lg"
+    >
+    </div>
+    <div
+      aria-hidden="true"
+      class="pointer-events-none absolute inset-x-0 bottom-0 h-20 opacity-20 blur-2xl"
+      style="background: radial-gradient(ellipse at bottom, var(--color-mv-green-500) 0%, transparent 70%);"
+    >
+    </div>
+    {/* display:contents no <picture> para que o <img> seja o proprio flex item.
+        sizes: o card renderiza a foto com no maximo ~260px de largura em
+        qualquer breakpoint (o container tem altura fixa e a imagem escala por
+        ela). Sem isto o browser assumia 100vw e baixava o arquivo de 900px pra
+        pintar 195px: ~100 KB desperdicados no celular, que e onde doi. */}
+    <picture class="contents">
+      <source srcset={asset(`${m.imagem}.avif`)} type="image/avif" sizes="260px" />
+      <source srcset={asset(`${m.imagem}.webp`)} type="image/webp" sizes="260px" />
+      <img
+        src={asset(`${m.imagem}.png`)}
+        alt={m.imagemAlt}
+        width={m.largura}
+        height={m.altura}
+        sizes="260px"
+        loading="lazy"
+        decoding="async"
+        class="relative max-h-full w-auto max-w-full object-contain object-bottom transition-transform duration-500 group-hover:scale-[1.03]"
+        style="transition-timing-function: var(--ease-mv);"
+      />
+    </picture>
+  </div>
+
+  <div class="flex flex-1 flex-col p-5 sm:p-6">
+    <div class="flex items-baseline justify-between gap-3">
+      <h3 class="font-display text-2xl font-black tracking-tight text-mv-text-1" translate="no">{m.codigo}</h3>
+      <span class="text-xs font-medium text-mv-text-3">{m.categoriaLabel}</span>
+    </div>
+
+    <p class="mt-1.5 font-display text-sm font-bold tracking-[0.1em] text-mv-text-3 uppercase">
+      {m.triade[0]}. {m.triade[1]}. <span class="text-mv-green-500">{m.triade[2]}</span>
+    </p>
+
+    <p class="mt-4 text-lg leading-snug font-semibold text-mv-text-1">{m.chamada}</p>
+    <p class="mt-2 text-sm leading-relaxed text-mv-text-2">{m.oQueE}</p>
+
+    {/* 2 specs heroi em display grande. */}
+    <dl class="mv-nums mt-6 grid grid-cols-2 gap-3">
+      <div class="rounded-xl border border-mv-border bg-mv-surface-2 px-4 py-3">
+        <dt class="font-display text-[0.65rem] font-bold tracking-[0.12em] text-mv-text-3 uppercase">Motor</dt>
+        <dd class="mt-0.5 font-display text-xl font-black text-mv-text-1">
+          {m.potenciaW.toLocaleString('pt-BR')}<span class="ml-0.5 text-sm font-bold text-mv-text-3">W</span>
+        </dd>
+      </div>
+      <div class="rounded-xl border border-mv-border bg-mv-surface-2 px-4 py-3">
+        <dt class="font-display text-[0.65rem] font-bold tracking-[0.12em] text-mv-text-3 uppercase">Velocidade</dt>
+        <dd class="mt-0.5 font-display text-xl font-black text-mv-text-1">
+          {m.velocidadeMaximaKmh}<span class="ml-0.5 text-sm font-bold text-mv-text-3">km/h</span>
+        </dd>
+      </div>
+    </dl>
+
+    <ul class="mt-5 space-y-2.5">
+      {
+        m.beneficios.map((b) => (
+          <li class="flex gap-2.5 text-sm leading-relaxed text-mv-text-2">
+            <span aria-hidden="true" class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-mv-green-500" />
+            <span>{b}</span>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="mt-auto pt-6">
+      <a
+        href={linkWhatsApp({ tipo: 'modelo', modelo: m.codigo })}
+        class="mv-btn mv-btn-primary w-full"
+        data-mv-event="whatsapp"
+        data-mv-valor={m.codigo}
+        rel="nofollow"
+      >
+        Falar no WhatsApp
+      </a>
+    </div>
+  </div>
+</article>

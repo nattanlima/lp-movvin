@@ -1,0 +1,80 @@
+---
+import FaixaVideo from './FaixaVideo.astro';
+import { linkWhatsApp } from '../lib/site';
+
+/* ============================================================================
+ * APOIO · 60+   ·   agora com a footage CERTA
+ * ----------------------------------------------------------------------------
+ * CORRECAO DE ERRO ANTERIOR: esta secao usava o mvb-03.mp4, que mostra uma
+ * bike AZUL-CLARA de DUAS rodas, e falava do MVT-03, que e um triciclo PRETO.
+ * A bike do mvb-03 nao corresponde a nenhum modelo da linha: e invencao da IA.
+ * Trocado pelo mvs-01.mp4, onde a senhora pilota a MVS-01 REAL (prata com
+ * detalhe laranja, identica ao mvs-01.png), numa cidade historica brasileira.
+ * Video, produto e nicho agora batem.
+ *
+ * O texto perdeu o "tres rodas": aquilo e do MVT-03 e mora no card dele. Aqui
+ * o assunto e AUTONOMIA, que e o que serve aos dois modelos.
+ *
+ * VETADO NESTE BLOCO, LITERALMENTE:
+ *  - A palavra "idoso". Ninguem se identifica como idoso numa LP.
+ *  - "Ela nao cai" / "nao precisa equilibrar": garantia absoluta de seguranca
+ *    (CDC art. 66) dirigida a consumidor hipervulneravel (art. 39, IV) sobre
+ *    um produto que tomba em curva.
+ * ========================================================================== */
+---
+
+<FaixaVideo
+  id="apoio"
+  video="apoio"
+  lado="direita"
+  cena="Uma senhora de capacete pilota uma scooter elétrica prata por uma rua de casario colonial, com a igreja da cidade ao fundo."
+>
+  <p class="mv-eyebrow">Pra ir e voltar sozinho.</p>
+
+  <h2 class="mv-display mv-h2 mt-4 text-mv-text-1">
+    <span class="block">Depender de alguém, né?</span>
+    <span class="block text-mv-green-500">Não precisa ser.</span>
+  </h2>
+
+  {/* Duas vozes: o filho, que decide a compra, e ele, que pilota. */}
+  <p class="mt-6 text-xl leading-relaxed text-mv-text-1 sm:text-2xl">
+    A farmácia, o mercado, a casa da amiga. Na hora que der vontade.
+  </p>
+
+  <p class="mt-4 max-w-[46ch] leading-relaxed text-mv-text-2">
+    Não é sobre a distância, é sobre não ter que pedir. Sem marcar horário com ninguém, sem esperar carona, sem
+    depender do ônibus passar.
+  </p>
+
+  <ul class="mt-9 space-y-3.5">
+    {
+      [
+        'Liga por aproximação: sem chave pra procurar na bolsa.',
+        'Painel LCD grande: velocidade e carga em número, não em risquinho.',
+        'Cesto e banco largo com encosto: a compra vai junto, sentado.',
+      ].map((p) => (
+        <li class="flex gap-3 text-mv-text-1">
+          <span aria-hidden="true" class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-mv-green-500" />
+          <span class="leading-relaxed">{p}</span>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="mt-9 flex flex-wrap gap-3">
+    <a
+      href={linkWhatsApp({ tipo: 'uso', uso: 'apoio' })}
+      class="mv-btn mv-btn-primary"
+      data-mv-event="whatsapp"
+      data-mv-valor="apoio"
+      rel="nofollow"
+    >
+      Falar no WhatsApp
+    </a>
+    <a href="#modelo-mvt-03" class="mv-btn mv-btn-ghost" data-mv-event="ancora" data-mv-valor="MVT-03">
+      Ver o triciclo
+    </a>
+  </div>
+  {/* A advertencia de tombamento saiu daqui por decisao do cliente e foi
+      para o paragrafo unico do rodape (ver Footer.astro). */}
+</FaixaVideo>

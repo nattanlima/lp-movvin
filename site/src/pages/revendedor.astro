@@ -1,0 +1,153 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../lib/site';
+
+/* Ordem validada nos concorrentes: headline de oportunidade -> contexto de
+   mercado -> 6 cards -> FAQ de qualificacao -> formulario. A Aima inverte
+   (pede CNPJ antes de dar motivo) e e a mais fraca do setor.
+   Formulario de 5 campos: sem CNPJ, sem CNAE, sem faturamento no primeiro
+   toque. Isso se pega na call.
+   O material de revenda e o MAIS conservador do site, nao o mais agressivo:
+   pelo CDC (arts. 18 e 30) o revendedor herda responsabilidade solidaria pela
+   oferta que veicula, e revendedor autuado abandona a marca. */
+
+const cards = [
+  { t: 'Margem', d: 'PENDENTE: a Movvin precisa definir a margem por linha.', pend: true },
+  { t: 'Pedido mínimo', d: '3 unidades. Sem taxa de franquia, sem royalties, sem obra.', pend: false },
+  { t: 'Território', d: 'PENDENTE: política de território. Não prometemos exclusividade que não existe.', pend: true },
+  { t: 'Garantia e RMA', d: 'PENDENTE: prazo, ciclos de bateria e fluxo de troca.', pend: true },
+  { t: 'Treinamento', d: 'Sua equipe aprende a explicar as duas linhas sem ler resolução.', pend: false },
+  { t: 'Material de venda', d: 'Ficha de enquadramento por modelo, pronta para o balcão.', pend: false },
+];
+---
+
+<Base
+  titulo="Seja um revendedor Movvin · Para quem já tem ponto"
+  descricao="Bicicletaria, oficina de moto ou loja de peças: agregue linha elétrica com o enquadramento legal declarado por modelo. Comece com 3 unidades."
+  path="/revendedor"
+>
+  <Header />
+  <main>
+    <section class="mv-section">
+      <div class="mv-container">
+        <p class="mv-eyebrow">Para quem já tem ponto.</p>
+        <h1 class="mv-display mv-h1 mt-4 max-w-[15ch] text-mv-text-1">
+          Venda elétrico sem <span class="text-mv-green-500">vender problema.</span>
+        </h1>
+        {/* NAO REINTRODUZIR "desde janeiro de 2026": a Res. 996/2023 esta em
+            vigor desde 3 de julho de 2023 (art. 22). */}
+        <p class="mt-7 max-w-[58ch] text-lg leading-relaxed text-mv-text-2">
+          A Resolução CONTRAN 996/2023 está em vigor desde julho de 2023, e quem toma o processo na cara é o balcão.
+          Cada Movvin chega na sua loja com a classificação legal declarada no papel.
+        </p>
+
+        <div class="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {
+            cards.map((c) => (
+              <div class="rounded-2xl border border-mv-border bg-mv-surface-1 p-6">
+                <h2 class="font-display text-base font-bold tracking-wide text-mv-text-1 uppercase">{c.t}</h2>
+                <p class:list={['mt-2.5 text-sm leading-relaxed', c.pend ? 'text-mv-danger' : 'text-mv-text-2']}>
+                  {c.d}
+                </p>
+              </div>
+            ))
+          }
+        </div>
+
+        {/* 5 campos. O submit fica HABILITADO ate a request comecar. */}
+        <form
+          class="mt-16 max-w-xl space-y-5"
+          method="POST"
+          action="/api/revendedor"
+          aria-labelledby="form-titulo"
+        >
+          <h2 id="form-titulo" class="mv-display text-2xl text-mv-text-1">Fale com a gente.</h2>
+
+          <div>
+            <label for="nome" class="mb-1.5 block text-sm font-medium text-mv-text-2">Nome</label>
+            <input
+              id="nome"
+              name="nome"
+              type="text"
+              required
+              autocomplete="name"
+              class="min-h-12 w-full rounded-xl border border-mv-border-strong bg-mv-surface-1 px-4 text-mv-text-1 placeholder:text-mv-text-3"
+            />
+          </div>
+
+          <div>
+            <label for="whatsapp" class="mb-1.5 block text-sm font-medium text-mv-text-2">WhatsApp</label>
+            <input
+              id="whatsapp"
+              name="whatsapp"
+              type="tel"
+              inputmode="tel"
+              required
+              autocomplete="tel"
+              placeholder="(11) 90000-0000"
+              class="min-h-12 w-full rounded-xl border border-mv-border-strong bg-mv-surface-1 px-4 text-mv-text-1 placeholder:text-mv-text-3"
+            />
+          </div>
+
+          <div>
+            <label for="cidade" class="mb-1.5 block text-sm font-medium text-mv-text-2">Cidade e UF</label>
+            <input
+              id="cidade"
+              name="cidade"
+              type="text"
+              required
+              autocomplete="address-level2"
+              class="min-h-12 w-full rounded-xl border border-mv-border-strong bg-mv-surface-1 px-4 text-mv-text-1 placeholder:text-mv-text-3"
+            />
+          </div>
+
+          <div>
+            <label for="ponto" class="mb-1.5 block text-sm font-medium text-mv-text-2">Já tem ponto comercial?</label>
+            <select
+              id="ponto"
+              name="ponto"
+              required
+              class="min-h-12 w-full rounded-xl border border-mv-border-strong bg-mv-surface-1 px-4 text-mv-text-1"
+            >
+              <option value="">Selecione</option>
+              <option value="bike">Loja de bike</option>
+              <option value="moto">Oficina de moto</option>
+              <option value="outro">Outro ramo</option>
+              <option value="nao">Ainda não</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="unidades" class="mb-1.5 block text-sm font-medium text-mv-text-2"
+              >Quantas unidades pretende começar?</label
+            >
+            <select
+              id="unidades"
+              name="unidades"
+              required
+              class="min-h-12 w-full rounded-xl border border-mv-border-strong bg-mv-surface-1 px-4 text-mv-text-1"
+            >
+              <option value="">Selecione</option>
+              <option value="3-5">3 a 5</option>
+              <option value="6-10">6 a 10</option>
+              <option value="10+">Mais de 10</option>
+              <option value="entender">Quero entender antes</option>
+            </select>
+          </div>
+
+          <button type="submit" class="mv-btn mv-btn-primary w-full" data-mv-event="lead-revendedor">
+            Quero representar a Movvin
+          </button>
+
+          <p class="text-xs leading-relaxed text-mv-text-3">
+            PENDENTE: política de privacidade (LGPD) e o endpoint que recebe este formulário. Ver
+            <code class="rounded bg-mv-surface-2 px-1.5 py-0.5">planejamento/04-perguntas-ao-cliente.md</code>.
+          </p>
+        </form>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Base>

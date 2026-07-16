@@ -1,0 +1,349 @@
+@import 'tailwindcss';
+
+/* ==========================================================================
+   MOVVIN · DESIGN SYSTEM
+   Todos os valores de cor foram MEDIDOS por amostragem de pixel nos assets
+   da marca (imagens/1..4.png), nao estimados.
+   - Verde da marca:  #C8F13F  (cor chapada dominante de 1.png e 4.png)
+   - Preto do logo:   #1A1A1A  (100% de 2.png e 3.png)
+   O fade do simbolo NAO e um degrade de cor: e um ramp de OPACIDADE sobre
+   cor constante. Reproduzir como linear-gradient(white,green) fica errado
+   sobre fundo escuro.
+   ========================================================================== */
+
+@theme {
+  /* --- Superficies -------------------------------------------------------
+     --mv-bg e mais fundo que o preto da marca de proposito: cria
+     profundidade e reduz o halo dos recortes PNG (franja de matte branco). */
+  --color-mv-bg: #0a0a0a;
+  --color-mv-surface-1: #141613;
+  --color-mv-surface-2: #1e211c;
+  --color-mv-surface-3: #2a2e27;
+  --color-mv-border: #2e322b;
+  --color-mv-border-strong: #3f443a;
+  /* EXCLUSIVO do logo sobre fundo claro. Nao usar como fundo de pagina. */
+  --color-mv-logo-black: #1a1a1a;
+
+  /* --- Verde da marca ----------------------------------------------------
+     500 e o valor exato medido. A rampa mantem o hue 73,8 graus. */
+  --color-mv-green-50: #f4fcdc;
+  --color-mv-green-100: #eafab9;
+  --color-mv-green-200: #dbf77e;
+  --color-mv-green-300: #d4f45f;
+  --color-mv-green-400: #cef34c;
+  --color-mv-green-500: #c8f13f; /* MARCA */
+  --color-mv-green-600: #a9cc35;
+  --color-mv-green-700: #7f9928;
+  /* Unico verde que pode virar TEXTO sobre branco (5,31:1). */
+  --color-mv-green-800: #5f731e;
+  --color-mv-green-900: #3f4c14;
+
+  /* --- Cinza-claro dos cards do FAQ ------------------------------------
+     Nao e cinza neutro: puxa pro hue 73,8 da marca, dessaturado ate virar
+     quase pedra. Ao lado do lima ele le como "a mesma familia, sem cor", e
+     nao como um cinza de sistema que caiu ali. Preto por cima da 14,9:1. */
+  --color-mv-faq-cinza: #dcdfd4;
+
+  /* --- Texto sobre superficie escura (todos auditados >= AA) ------------- */
+  --color-mv-text-1: #ffffff;
+  --color-mv-text-2: #c9cfc2;
+  --color-mv-text-3: #868a7c; /* 4,5:1 no #0A0A0A. Nao escurecer mais. */
+
+  /* --- Estado ------------------------------------------------------------ */
+  --color-mv-danger: #ff4536;
+  --color-mv-warning: #ffb020;
+  --color-mv-info: #4da3ff;
+
+  /* --- Tipografia --------------------------------------------------------
+     Archivo: display condensada (eixos wght + wdth) = a voz das pecas.
+     Inter: corpo. Altura-x grande = legibilidade para o publico 60+,
+     que aqui e requisito de negocio, nao preferencia estetica. */
+  --font-display: 'Archivo Variable', 'Archivo', system-ui, sans-serif;
+  --font-body: 'Inter Variable', 'Inter', system-ui, sans-serif;
+
+  /* --- Motion ------------------------------------------------------------
+     ease-in-out e linear sao vetados. Esta curva e a unica da pagina. */
+  --ease-mv: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* --- Fontes self-hosted: zero request a fonts.googleapis.com --------------
+   Um handshake TLS a menos em 4G e um problema de LGPD a menos. */
+/* O caminho aqui e ABSOLUTO E COM O BASE ESCRITO A MAO, de proposito.
+   @font-face nao enxerga import.meta.env, e url() relativo resolveria contra
+   a URL da PAGINA (que muda entre / e /suporte), nao contra o CSS: o CSS e
+   inlinado no HTML. Se o `base` do astro.config mudar, ESTAS DUAS LINHAS
+   mudam junto. E o unico lugar do projeto com o base escrito na mao. */
+@font-face {
+  font-family: 'Archivo Variable';
+  src: url('/lp-movvin/fonts/archivo-var.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Inter Variable';
+  src: url('/lp-movvin/fonts/inter-var.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-display: swap;
+  font-style: normal;
+}
+
+/* ========================================================================== */
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    /* Ancora de scroll: o header sticky nao pode cobrir o alvo. */
+    scroll-padding-top: 5rem;
+
+    /* A geometria do recuo mora aqui, nao no .mv-container: quem precisa ir
+       full bleed e mesmo assim alinhar o texto com a pagina (ver .mv-bleed)
+       tem que reproduzir a mesma conta, e duas fontes de verdade divergem
+       na primeira vez que alguem mexer numa delas. */
+    --mv-largura: 1360px;
+    --mv-goteira: clamp(1rem, 2.5vw, 2.5rem);
+  }
+
+  /* O fundo mora SO no html. Se o body tambem tiver background-color, ele
+     deixa de ser propagado para o canvas e passa a pintar como fundo de
+     elemento comum — que cobre todo descendente com z-index negativo. Era o
+     que apagava o refletor de palco e o glow do hero: eles renderizavam,
+     mas o body pintava por cima. */
+  html {
+    background-color: var(--color-mv-bg);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    color: var(--color-mv-text-1);
+    font-family: var(--font-body);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    /* O body NUNCA rola na horizontal. Conteudo largo rola no proprio container. */
+    overflow-x: clip;
+  }
+
+  /* Foco visivel em tudo. Nunca outline:none sem substituto.
+     O anel usa a cor de foco da superficie, nao a cor da marca: sobre a faixa
+     verde chapada do revendedor, um anel #C8F13F daria 1,00:1 e o foco ficaria
+     literalmente invisivel no CTA B2B de maior ticket da pagina. Mesma
+     colisao de 1,30:1 que a paleta evita no texto, so que na cor do foco. */
+  :root {
+    --mv-focus: var(--color-mv-green-500);
+  }
+  :focus-visible {
+    outline: 3px solid var(--mv-focus);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Alvos de toque: 44px minimo. Requisito para o publico 60+. */
+  a,
+  button,
+  [role='button'] {
+    touch-action: manipulation;
+  }
+
+  h1,
+  h2,
+  h3 {
+    /* PT-BR tem palavra longa e faz viuva. */
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  img,
+  video {
+    max-width: 100%;
+    height: auto;
+  }
+
+  ::selection {
+    background: var(--color-mv-green-500);
+    color: var(--color-mv-bg);
+  }
+}
+
+@layer components {
+  /* --- Macro-tipografia: o registro NOITE ---------------------------------
+     leading 0.9 e tracking negativo = o descritor exato das pecas sociais. */
+  .mv-display {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-stretch: 68%;
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+  }
+
+  /* Dimensionada para que a linha mais longa do hero ("Não precisa ser.",
+     16 caracteres em Archivo 900/wdth68 ~= 8em) caiba SEM quebrar na coluna,
+     de 390px ate 1440px. Se a headline mudar, refazer a conta: uma quebra
+     automatica aqui reparte a frase em 4 linhas e mata o ritmo de 2 tempos
+     que e a voz da marca. */
+  .mv-h1 {
+    font-size: clamp(2.6rem, 1.64rem + 3.94vw, 5.2rem);
+    text-wrap: nowrap;
+  }
+
+  .mv-h2 {
+    font-size: clamp(2rem, 1rem + 5vw, 4.25rem);
+  }
+
+  /* --- Eyebrow: orcamento de 3 na pagina inteira -------------------------- */
+  .mv-eyebrow {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-stretch: 75%;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: clamp(0.75rem, 0.7rem + 0.2vw, 0.875rem);
+    color: var(--color-mv-green-500);
+  }
+
+  /* --- Botao primario: label SEMPRE escuro sobre verde --------------------
+     Branco sobre verde = 1,30:1 e reprova ate AA-large. Regra rigida. */
+  .mv-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 48px;
+    padding: 0.875rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1;
+    text-decoration: none;
+    transition:
+      background-color 180ms var(--ease-mv),
+      transform 180ms var(--ease-mv),
+      border-color 180ms var(--ease-mv);
+  }
+
+  .mv-btn-primary {
+    background-color: var(--color-mv-green-500);
+    color: var(--color-mv-bg);
+  }
+  .mv-btn-primary:hover {
+    background-color: var(--color-mv-green-300);
+  }
+  .mv-btn-primary:active {
+    transform: translateY(1px);
+  }
+
+  .mv-btn-ghost {
+    background-color: transparent;
+    color: var(--color-mv-text-1);
+    border: 1px solid var(--color-mv-border-strong);
+  }
+  .mv-btn-ghost:hover {
+    border-color: var(--color-mv-green-500);
+    color: var(--color-mv-green-500);
+  }
+
+  /* Botao sobre a faixa verde chapada do revendedor. */
+  .mv-btn-on-green {
+    background-color: var(--color-mv-bg);
+    color: var(--color-mv-green-500);
+  }
+  .mv-btn-on-green:hover {
+    background-color: var(--color-mv-logo-black);
+  }
+
+  /* O recuo lateral tem DUAS fontes, e so mexer no padding nao resolve: em
+     1440px eram 120px de margem (max-width 1200) + 40px de padding = 160px
+     ate o conteudo. Subir o max-width pra 1360 e afinar o padding leva isso
+     pra ~76px, metade do que era, sem espremer o mobile (la o padding cai de
+     20px pra 16px, que ainda respira). */
+  .mv-container {
+    width: 100%;
+    max-width: var(--mv-largura);
+    margin-inline: auto;
+    padding-inline: var(--mv-goteira);
+  }
+
+  /* FULL BLEED ALINHADO.
+     Para um elemento que precisa ir de ponta a ponta da tela (uma faixa de
+     cor, por exemplo) mas cujo TEXTO tem que continuar alinhado com o resto
+     da pagina. Nao da pra resolver com 100vw dentro do container, porque quem
+     tem overflow:hidden corta o vazamento; entao o elemento nasce fora do
+     container, em largura cheia, e recupera o recuo por padding.
+     O 100% aqui e a largura do proprio elemento (que e a da tela), entao a
+     conta reproduz exatamente a margem que o .mv-container teria. */
+  .mv-bleed {
+    width: 100%;
+    padding-inline: calc(max(0px, (100% - var(--mv-largura)) / 2) + var(--mv-goteira));
+  }
+
+  .mv-section {
+    padding-block: clamp(4.5rem, 10vw, 8rem);
+  }
+
+  /* Numeros de spec alinham em coluna. */
+  .mv-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* --- Reveal: IntersectionObserver, nunca listener de scroll --------------- */
+@layer utilities {
+  .mv-reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 700ms var(--ease-mv),
+      transform 700ms var(--ease-mv);
+    will-change: opacity, transform;
+  }
+  .mv-reveal[data-shown] {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Cascata: --mv-i vem do indice do card. 70ms e o intervalo em que a
+     sequencia ainda le como UM movimento, e nao como 5 movimentos. */
+  .mv-stagger {
+    transition-delay: calc(var(--mv-i, 0) * 70ms);
+  }
+
+  /* A grade de limalha respira onde o texto vive. No celular o texto ocupa a
+     largura toda, entao a mascara e vertical (abre em cima, fecha embaixo);
+     no desktop ela abre a coluna da esquerda, que e onde o texto mora. */
+  .mv-magnet-mask {
+    -webkit-mask-image: radial-gradient(
+      ellipse 130% 78% at 12% 42%,
+      transparent 18%,
+      rgba(0, 0, 0, 0.35) 46%,
+      #000 74%
+    );
+    mask-image: radial-gradient(ellipse 130% 78% at 12% 42%, transparent 18%, rgba(0, 0, 0, 0.35) 46%, #000 74%);
+  }
+  @media (max-width: 640px) {
+    .mv-magnet-mask {
+      -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.28) 34%, rgba(0, 0, 0, 0.28) 82%, #000 100%);
+      mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.28) 34%, rgba(0, 0, 0, 0.28) 82%, #000 100%);
+    }
+  }
+}
+
+/* --- Reduced motion: a onda vira corte estatico -------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .mv-reveal {
+    opacity: 1;
+    transform: none;
+  }
+}

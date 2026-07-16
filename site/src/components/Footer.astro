@@ -1,0 +1,97 @@
+---
+import { rota } from '../lib/url';
+import Logo from './Logo.astro';
+import { site, norma } from '../lib/site';
+
+/* ============================================================================
+ * Rodape
+ * ----------------------------------------------------------------------------
+ * Por decisao do cliente, TUDO que e informacao legal vive num paragrafo unico
+ * no fim da pagina: identificacao da empresa, divulgacao de IA, referencia da
+ * norma e as duas advertencias que antes eram ostensivas nas faixas.
+ *
+ * >>> REGISTRO, PRA QUEM VIER DEPOIS <<<
+ * As advertencias de tombamento (MVT-03) e de transporte de crianca nasceram
+ * DENTRO das faixas, em destaque, porque advertencia de seguranca em letra
+ * miuda no rodape e o oposto do que o art. 9 do CDC pede ("ostensiva"). Elas
+ * foram movidas pra ca a pedido do cliente. Nao e um detalhe de layout: e uma
+ * decisao dele, registrada. Se voltar a discussao, o lugar tecnicamente certo
+ * e no bloco do produto.
+ *
+ * Zero em-dash, como no resto da pagina: os separadores sao "·".
+ * ========================================================================== */
+
+const ano = 2026;
+
+const identificacao = [
+  site.razaoSocial,
+  `CNPJ ${site.cnpj}`,
+  `${site.endereco} · ${site.cidade}/${site.uf}`,
+].join(' · ');
+---
+
+<footer class="border-t border-mv-border bg-mv-bg" style="padding-bottom: env(safe-area-inset-bottom);">
+  <div class="mv-container py-12">
+    <div class="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
+      <Logo />
+
+      {/* Os links tinham 20px de altura e ficavam colados: eram o pior alvo de
+          toque da pagina, e o rodape e uma das poucas navegacoes que existem.
+          min-h-11 (44px) e o minimo do HIG e do WCAG 2.5.5. O -mx-3 devolve o
+          alinhamento otico que o padding roubou. */}
+      <nav
+        aria-label="Rodapé"
+        class="-mx-3 flex flex-col text-[0.95rem] sm:-mr-3 sm:ml-0 sm:items-end sm:text-sm"
+      >
+        {
+          [
+            { href: '#linha', t: 'A linha' },
+            { href: '#beneficios', t: 'Benefícios' },
+            { href: '#faq', t: 'Perguntas' },
+            { href: rota('/suporte'), t: 'Suporte' },
+            { href: rota('/revendedor'), t: 'Revendedor' },
+            { href: rota('/privacidade'), t: 'Privacidade' },
+          ].map((l) => (
+            <a
+              href={l.href}
+              class="flex min-h-11 items-center px-3 text-mv-text-2 transition-colors hover:text-mv-green-500"
+            >
+              {l.t}
+            </a>
+          ))
+        }
+        <a
+          href={site.instagramUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex min-h-11 items-center px-3 text-mv-text-2 transition-colors hover:text-mv-green-500"
+          data-mv-event="social"
+          data-mv-valor="instagram"
+        >
+          Instagram
+        </a>
+      </nav>
+    </div>
+
+    {/* O paragrafo unico. Sobe pra 14px no celular: a 12px o publico 60+ nao
+        le, e aqui moram as duas advertencias de seguranca. Corpo pequeno pra
+        nao competir com o conteudo, nunca pequeno a ponto de ser enfeite. */}
+    <p class="mt-10 border-t border-mv-border pt-7 text-sm leading-[1.75] text-mv-text-3 sm:text-xs">
+      {identificacao}. Todos os direitos reservados. Instagram <a
+        href={site.instagramUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="underline underline-offset-2 hover:text-mv-text-2">{site.instagram}</a
+      >. {site.usarVideos && site.divulgacaoIA}{' '}
+      Classificação de veículos conforme a <a
+        href={norma.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="underline underline-offset-2 hover:text-mv-text-2">{norma.ref}</a
+      >, publicada em {norma.publicada} e em vigor desde {norma.vigenciaDesde}. Atenção: o MVT-03 tem três rodas e
+      apoio permanente na parada, mas, como qualquer veículo de três rodas, pode tombar em curva feita com
+      velocidade. Use capacete. Atenção: o transporte de crianças tem regras próprias no Código de Trânsito
+      Brasileiro. Capacete sempre, nas duas cabeças. © {ano} Movvin.
+    </p>
+  </div>
+</footer>

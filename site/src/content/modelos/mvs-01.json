@@ -1,0 +1,31 @@
+{
+  "codigo": "MVS-01",
+  "nome": "MVS-01",
+  "categoria": "scooter",
+  "categoriaLabel": "Scooter elétrica",
+  "ordem": 3,
+  "triade": [
+    "COMPACTA",
+    "ESPERTA",
+    "100% ELÉTRICA."
+  ],
+  "chamada": "Cabe em qualquer vaga.",
+  "potenciaW": 1000,
+  "velocidadeMaximaKmh": 35,
+  "rodas": 2,
+  "oQueE": "Compacta de verdade: estaciona onde moto não cabe e não paga estacionamento.",
+  "beneficios": [
+    "Compacta: estaciona em qualquer canto",
+    "Painel LCD e NFC",
+    "Zero combustível, zero troca de óleo"
+  ],
+  "usos": [
+    "dia-a-dia",
+    "trabalho"
+  ],
+  "imagem": "/img/mvs-01",
+  "imagemAlt": "MVS-01: scooter elétrica prata e preta, de linhas retas, com detalhe laranja no quadro e banco marrom",
+  "largura": 900,
+  "altura": 865,
+  "publicado": true
+}

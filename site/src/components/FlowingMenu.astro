@@ -1,0 +1,256 @@
+---
+import { asset } from '../lib/url';
+
+/* ============================================================================
+ * FLOWING MENU · porte do componente do reactbits.dev
+ * ----------------------------------------------------------------------------
+ * Lista de usos em tipografia grande. Ao passar o mouse, uma faixa lima entra
+ * PELA BORDA POR ONDE O CURSOR ENTROU, com o texto repetindo em marquee e a
+ * foto do uso. Ao sair, ela sai pela borda por onde o cursor saiu. E esse
+ * detalhe (entrar e sair pelo lado certo) que faz o efeito parecer fisico em
+ * vez de um fade generico.
+ *
+ * O original depende do GSAP (~70 KB) so pra animar dois transforms. Aqui a
+ * animacao e CSS: o JS faz UMA coisa, que CSS nao consegue: descobrir por qual
+ * aresta o ponteiro cruzou. Sao ~25 linhas e nenhuma dependencia.
+ *
+ * O marquee corre com animation nativa e a trilha e duplicada, entao o loop
+ * em -50% e continuo. Ele so anima quando o item esta em hover: marquee
+ * rodando o tempo todo fora de cena e GPU queimada a toa.
+ *
+ * Acessibilidade: cada item e um <a> de verdade, com href de verdade. O efeito
+ * inteiro e decoracao por cima; teclado e leitor de tela navegam a lista
+ * normalmente, e o foco tambem dispara a faixa (nao so o mouse).
+ * ========================================================================== */
+
+export interface ItemFluxo {
+  texto: string;
+  href: string;
+  imagem: string; // basename em /img (sem extensao)
+  alt: string;
+}
+
+interface Props {
+  itens: ItemFluxo[];
+  class?: string;
+}
+
+const { itens, class: klass = '' } = Astro.props;
+
+/* Repeticoes do par [texto + foto] na trilha. 4 cobrem telas largas sem
+   deixar buraco; a trilha e renderizada 2x pro loop fechar. */
+const REPETICOES = 4;
+---
+
+<nav class={`mv-flow ${klass}`} aria-label="Escolha por uso" data-mv-flow>
+  {
+    itens.map((it) => (
+      <a
+        class="mv-flow-item mv-bleed"
+        href={it.href}
+        data-mv-event="uso"
+        data-mv-valor={it.href.replace('#modelo-', '')}
+      >
+        <span class="mv-flow-rotulo mv-display">{it.texto}</span>
+
+        {/* MOBILE: a foto aparece de vez, aqui. Em touch nao existe hover,
+            entao o marquee nunca dispara e as 4 fotos que o cliente pediu
+            baixavam ~84 KB pra nunca serem vistas. Agora o celular ganha a
+            miniatura estatica e o marquee inteiro nao renderiza (display:none
+            + loading=lazy = o browser nunca busca aquelas imagens la). */}
+        {/* Arquivo -sm: 160x120. A miniatura pinta 75x56 CSS = 150x112 em DPR
+            2, e servir o de 480x360 pra isso custava 83 KB pra 4 selos. O -sm
+            custa 12 KB no total. O arquivo grande continua no marquee, que so
+            existe no desktop. */}
+        <picture class="mv-flow-thumb sm:hidden">
+          <source srcset={asset(`/img/${it.imagem}-sm.avif`)} type="image/avif" />
+          <img src={asset(`/img/${it.imagem}-sm.webp`)} alt="" width="160" height="120" loading="lazy" decoding="async" />
+        </picture>
+
+        <span class="mv-flow-seta" aria-hidden="true">
+          →
+        </span>
+
+        {/* A faixa que entra. aria-hidden: e a mesma informacao do rotulo,
+            repetida por efeito. Anunciar 8x seria ruido no leitor de tela. */}
+        <span class="mv-flow-faixa" aria-hidden="true">
+          <span class="mv-flow-trilha">
+            {Array.from({ length: REPETICOES * 2 }).map(() => (
+              <span class="mv-flow-par">
+                <span class="mv-flow-eco mv-display">{it.texto}</span>
+                <picture>
+                  <source srcset={asset(`/img/${it.imagem}.avif`)} type="image/avif" />
+                  <img src={asset(`/img/${it.imagem}.webp`)} alt="" width="480" height="360" loading="lazy" decoding="async" />
+                </picture>
+              </span>
+            ))}
+          </span>
+        </span>
+      </a>
+    ))
+  }
+</nav>
+
+<style>
+  .mv-flow {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--color-mv-border);
+  }
+
+  /* O item e FULL BLEED: vai de ponta a ponta da tela, e o rotulo recupera o
+     alinhamento com o resto da pagina via .mv-bleed (padding, nao margem).
+     Nao adianta esticar so a faixa verde com 100vw: o overflow:hidden daqui
+     (que existe pra conter o marquee) cortaria o vazamento na hora. Quem
+     precisa sangrar e o item inteiro. */
+  .mv-flow-item {
+    position: relative;
+    display: flex;
+    flex: 1 1 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    overflow: hidden;
+    border-bottom: 1px solid var(--color-mv-border);
+    min-height: clamp(88px, 15vh, 150px);
+    text-decoration: none;
+    isolation: isolate;
+    /* O item vive numa secao ESCURA, entao herdaria o anel de foco verde do
+       :root. Mas o proprio foco revela a faixa LIMA: o anel verde caia sobre
+       fundo verde e dava 1,00:1, ou seja, foco invisivel no unico jeito de
+       navegar este menu por teclado. Aqui ele inverte junto com a faixa. */
+    --mv-focus: var(--color-mv-bg);
+  }
+
+  .mv-flow-rotulo {
+    position: relative;
+    z-index: 1;
+    font-size: clamp(1.75rem, 1rem + 3vw, 4rem);
+    color: var(--color-mv-text-1);
+  }
+  .mv-flow-seta {
+    position: relative;
+    z-index: 1;
+    font-size: 1.5rem;
+    color: var(--color-mv-text-3);
+  }
+
+  /* A faixa COBRE o rotulo (z-index acima), nao passa por baixo dele.
+     Com a faixa em z-index 0 o rotulo branco ficava sobrando por cima do
+     lima e colidia com o proprio texto do marquee: lia como render quebrado.
+     Cobrindo, o rotulo vira o eco e a troca e limpa. Efeito colateral bom:
+     nao existe rotulo branco sobre lima em nenhum frame, entao o 1,30:1
+     nunca chega a acontecer. */
+  /* A miniatura do celular. So existe abaixo de sm. */
+  .mv-flow-thumb {
+    position: relative;
+    z-index: 1;
+    display: block;
+    flex: none;
+    margin-left: auto;
+  }
+  .mv-flow-thumb img {
+    height: 56px;
+    width: 75px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+
+  /* O marquee inteiro nao renderiza no celular: display:none impede o
+     loading=lazy de buscar as fotos de dentro dele. E o que transforma
+     84 KB de desperdicio em zero. */
+  .mv-flow-faixa {
+    display: none;
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    align-items: center;
+    background: var(--color-mv-green-500);
+    /* --dir vem do JS: -1 se o cursor entrou por cima, 1 se entrou por baixo.
+       E o unico dado que CSS nao tem como saber sozinho. */
+    transform: translateY(calc(var(--dir, 1) * 101%));
+    transition: transform 600ms cubic-bezier(0.19, 1, 0.22, 1);
+    will-change: transform;
+  }
+  @media (min-width: 640px) {
+    .mv-flow-faixa {
+      display: flex;
+    }
+  }
+  .mv-flow-item:is(:hover, :focus-visible) .mv-flow-faixa {
+    transform: translateY(0);
+  }
+
+  /* Sem padding: a faixa sangra ate a borda da tela e o marquee tem que
+     comecar na borda tambem, senao sobra um naco de lima vazio nas pontas. */
+  .mv-flow-trilha {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    /* Pausado por padrao: marquee correndo fora de cena e GPU a toa. */
+    animation: mv-flow-corre 22s linear infinite;
+    animation-play-state: paused;
+  }
+  .mv-flow-item:is(:hover, :focus-visible) .mv-flow-trilha {
+    animation-play-state: running;
+  }
+
+  @keyframes mv-flow-corre {
+    to {
+      /* A trilha e renderizada 2x: -50% cai exatamente no clone e o loop nao tem emenda. */
+      transform: translateX(-50%);
+    }
+  }
+
+  .mv-flow-par {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .mv-flow-eco {
+    font-size: clamp(1.75rem, 1rem + 3vw, 4rem);
+    white-space: nowrap;
+    color: var(--color-mv-bg);
+  }
+
+  .mv-flow-par img {
+    height: clamp(56px, 10vh, 104px);
+    width: auto;
+    aspect-ratio: 4 / 3;
+    border-radius: 10px;
+    object-fit: cover;
+    flex: none;
+  }
+
+  /* Sem movimento: a faixa entra por opacidade e o marquee nunca corre.
+     O conteudo e o link continuam identicos. */
+  @media (prefers-reduced-motion: reduce) {
+    .mv-flow-faixa {
+      transform: none;
+      opacity: 0;
+      transition: opacity 200ms;
+    }
+    .mv-flow-item:is(:hover, :focus-visible) .mv-flow-faixa {
+      opacity: 1;
+    }
+    .mv-flow-trilha {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  /* A UNICA coisa que o CSS nao resolve: por qual aresta o ponteiro cruzou.
+     O resto (entrada, saida, marquee) e transition e animation. */
+  document.querySelectorAll<HTMLElement>('[data-mv-flow] .mv-flow-item').forEach((item) => {
+    const lado = (e: PointerEvent) => {
+      const r = item.getBoundingClientRect();
+      // Perto do topo -> entrou/saiu por cima (-1). Perto da base -> por baixo (1).
+      return e.clientY - r.top < r.height / 2 ? -1 : 1;
+    };
+    item.addEventListener('pointerenter', (e) => item.style.setProperty('--dir', String(lado(e))), { passive: true });
+    item.addEventListener('pointerleave', (e) => item.style.setProperty('--dir', String(lado(e))), { passive: true });
+  });
+</script>

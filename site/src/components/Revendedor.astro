@@ -1,0 +1,95 @@
+---
+import { rota } from '../lib/url';
+import MagnetLines from './MagnetLines.astro';
+
+/* ============================================================================
+ * REVENDEDOR · A ponte
+ * ----------------------------------------------------------------------------
+ * CORTE RETO NO TOPO, NAO A ONDA. A onda ja foi gasta na costura noite/dia e
+ * a gramatica da marca e "uma curva por peca". Um corte reto e duro diz
+ * sozinho que ali comeca outra conversa, com outro interlocutor.
+ *
+ * Faixa de contraste invertido: verde chapado #C8F13F com texto #0A0A0A
+ * (15,19:1). NUNCA texto branco sobre o verde: 1,30:1, reprova ate AA-large.
+ *
+ * Encaixe com a tese: o revendedor e a UNICA prova que sustenta a secao do
+ * consumidor, porque resolve as duas maiores objecoes de uma vez, assistencia
+ * perto de casa e ajuda para emplacar. A rede nao e apendice da pagina: e a
+ * prova.
+ *
+ * VETADO, e as 3 propostas escreveram isso: "os leads da sua regiao sao seus".
+ * Nao existe regiao, nao existe roteamento, nao existe rede. E a promessa que
+ * corroeu a Voltz. Uma marca sem rede nao promete rede.
+ *
+ * NADA DE FORMULARIO AQUI: mata o folego da pagina B2C. Vive em /revendedor.
+ * ========================================================================== */
+
+const provas = [
+  {
+    n: '1',
+    t: 'Comece com 3 unidades.',
+    d: 'Sem taxa de franquia, sem royalties, sem obra. Você já tem o ponto: a linha elétrica entra nele.',
+  },
+  {
+    n: '2',
+    t: 'Enquadramento legal declarado por modelo, por escrito.',
+    d: 'Você sabe o que pode vender, e o seu cliente sabe o que pode pilotar. Os dois no papel.',
+  },
+  {
+    n: '3',
+    t: 'Treinamento e material de venda prontos.',
+    d: 'Sua equipe aprende a explicar a diferença entre as duas linhas sem precisar ler resolução.',
+  },
+];
+---
+
+{/* --mv-focus invertido: sobre o verde chapado, o anel de foco tem que ser
+    escuro. Verde sobre verde = 1,00:1 (foco invisivel). */}
+<section
+  id="revendedor"
+  class="relative isolate overflow-hidden bg-mv-green-500 text-mv-bg"
+  style="--mv-focus: var(--color-mv-bg);"
+>
+  {/* Mesma grade da faixa "Vá além": as duas faixas lima da pagina passam a
+      ter o mesmo tratamento de fundo, que era a inconsistencia. */}
+  <MagnetLines
+    class="mv-magnet-mask absolute inset-0 -z-10 opacity-[0.22]"
+    rows={7}
+    columns={22}
+    lineColor="var(--color-mv-bg)"
+    lineWidth="2px"
+    lineHeight="clamp(26px, 3.4vw, 46px)"
+    baseAngle={-10}
+  />
+
+  <div class="mv-container mv-section relative">
+    <p class="font-display text-xs font-bold tracking-[0.14em] text-mv-bg/70 uppercase">Para quem já tem ponto.</p>
+
+    <h2 class="mv-display mv-h2 mt-4 max-w-[16ch] text-mv-bg">Venda elétrico sem vender problema.</h2>
+
+    {/* NAO REINTRODUZIR "desde janeiro de 2026 a fiscalizacao e real": e falso.
+        A Res. 996/2023 esta em vigor desde 3 de julho de 2023 (art. 22). */}
+    <p class="mt-7 max-w-[58ch] text-lg leading-relaxed text-mv-bg/80">
+      A gente te diz o que você pode vender, do mesmo jeito que diz ao seu cliente o que ele pode pilotar. A
+      Resolução CONTRAN 996 está em vigor desde 2023, e quem toma o processo na cara é quem vendeu. Cada Movvin
+      chega na sua loja com o enquadramento legal declarado no papel.
+    </p>
+
+    <ul class="mt-12 grid gap-8 sm:grid-cols-3">
+      {
+        provas.map((p) => (
+          <li class="border-t-2 border-mv-bg/25 pt-5">
+            {/* /45 dava 3,02:1 e reprovava. /70 = 6,4:1. */}
+            <span class="mv-nums font-display text-sm font-black text-mv-bg/70">{p.n}</span>
+            <h3 class="mt-1.5 font-display text-lg leading-tight font-bold text-mv-bg">{p.t}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-mv-bg/75">{p.d}</p>
+          </li>
+        ))
+      }
+    </ul>
+
+    <a href={rota("/revendedor")} class="mv-btn mv-btn-on-green mt-12" data-mv-event="revendedor">
+      Quero representar a Movvin
+    </a>
+  </div>
+</section>

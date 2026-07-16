@@ -1,0 +1,30 @@
+# Dependências e build
+node_modules/
+dist/
+.astro/
+.vercel/
+.output/
+
+# Skills de agente instaladas localmente (npx skills add).
+# Ficam no disco, não no repositório: 14 MB que ninguém que clonar precisa.
+.agents/
+.claude/
+skills-lock.json
+
+# Vídeos-fonte gerados por IA: 41 MB.
+# Os cortes que o site realmente serve estão versionados em site/public/video/.
+# Estes aqui são o material bruto de onde eles saíram; ficam fora do git porque
+# todo clone pagaria 41 MB para sempre por placeholders que vão ser substituídos
+# por filmagem real. Como regerar está documentado no README.
+assets/video/
+
+# Ambiente e logs
+.env
+.env.*
+!.env.example
+*.log
+npm-debug.log*
+
+# Sistema
+.DS_Store
+Thumbs.db

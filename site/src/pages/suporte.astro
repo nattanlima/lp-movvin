@@ -1,0 +1,94 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site, linkWhatsApp, estaPendente } from '../lib/site';
+
+/* ============================================================================
+ * SUPORTE
+ * ----------------------------------------------------------------------------
+ * Esta pagina existe por dois motivos, nao um:
+ * 1. O rodape e o header linkam /suporte. Sem ela, 404.
+ * 2. E o unico lugar que sobrou pra SAC, garantia e prazo de peca depois que
+ *    a secao "Quem assina" saiu da home. Esses campos sao piso do CDC (art. 6,
+ *    III e art. 31) e sao autuaveis por si so.
+ *
+ * Os campos ainda PENDENTES aparecem marcados, em vermelho: e melhor a lacuna
+ * ser visivel do que fingir que a informacao existe.
+ * ========================================================================== */
+
+const CAMPOS = [
+  { rot: 'Razão social', val: site.razaoSocial },
+  { rot: 'CNPJ', val: site.cnpj },
+  { rot: 'Endereço', val: `${site.endereco}, ${site.cidade}/${site.uf}` },
+  { rot: 'SAC', val: site.sac },
+  { rot: 'Horário de atendimento', val: site.sacHorario },
+  { rot: 'E-mail', val: site.email },
+  { rot: 'Garantia', val: site.garantiaAnos },
+  { rot: 'Garantia da bateria', val: site.garantiaCiclosBateria },
+  { rot: 'Prazo de entrega de peça', val: site.prazoEntregaPeca },
+];
+---
+
+<Base
+  titulo="Suporte | Movvin"
+  descricao="Fale com a Movvin. Atendimento pelo WhatsApp, dados da empresa, garantia e assistência técnica."
+  path="/suporte"
+>
+  <Header />
+  <main>
+    <section class="mv-section">
+      <div class="mv-container">
+        <p class="mv-eyebrow">Suporte.</p>
+        <h1 class="mv-display mv-h2 mt-6 max-w-[14ch] text-mv-text-1">
+          Precisa de <span class="text-mv-green-500">ajuda?</span>
+        </h1>
+        <p class="mt-8 max-w-[52ch] text-lg leading-relaxed text-mv-text-2">
+          O jeito mais rápido é o WhatsApp. A gente responde por lá, de segunda a sábado.
+        </p>
+
+        <a
+          href={linkWhatsApp({ tipo: 'geral' })}
+          class="mv-btn mv-btn-primary group mt-8 gap-2.5"
+          data-mv-event="whatsapp"
+          data-mv-valor="suporte"
+          rel="nofollow"
+        >
+          Falar no WhatsApp
+          <span
+            aria-hidden="true"
+            class="flex h-6 w-6 items-center justify-center rounded-full border border-mv-bg/35 text-xs transition-transform duration-300 group-hover:translate-x-0.5"
+            style="transition-timing-function: var(--ease-mv);">→</span
+          >
+        </a>
+
+        <h2 class="mv-display mt-20 text-2xl text-mv-text-1">Quem assina a Movvin</h2>
+        <p class="mt-3 max-w-[52ch] leading-relaxed text-mv-text-2">
+          Está tudo escrito porque você tem o direito de conferir antes de pagar.
+        </p>
+
+        <dl class="mt-8 max-w-3xl divide-y divide-mv-border border-y border-mv-border">
+          {
+            CAMPOS.map(({ rot, val }) => (
+              <div class="grid grid-cols-1 gap-1 py-5 sm:grid-cols-[14rem_1fr] sm:gap-6">
+                <dt class="font-display text-xs font-bold tracking-[0.12em] text-mv-text-3 uppercase">{rot}</dt>
+                <dd class:list={['mv-nums', estaPendente(val) ? 'text-mv-danger' : 'text-mv-text-1']}>
+                  {estaPendente(val) ? 'Pendente' : val}
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+
+        <p class="mt-6 max-w-[62ch] text-sm leading-relaxed text-mv-text-3">
+          Assistência técnica: {
+            site.assistencia.length
+              ? site.assistencia.map((a) => `${a.cidade}/${a.uf}, ${a.endereco}`).join(' · ')
+              : 'em implantação. Fale com a gente no WhatsApp que a gente resolve o seu caso.'
+          }
+        </p>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Base>

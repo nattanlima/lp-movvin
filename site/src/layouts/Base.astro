@@ -1,0 +1,196 @@
+---
+import '../styles/global.css';
+import { site, norma, estaPendente } from '../lib/site';
+import { asset, urlAbsoluta } from '../lib/url';
+
+interface Props {
+  titulo: string;
+  descricao: string;
+  path?: string;
+  jsonLd?: Record<string, unknown>[];
+  ogImagem?: string;
+}
+
+const { titulo, descricao, path = '/', jsonLd = [], ogImagem = '/img/og.jpg' } = Astro.props;
+const canonical = urlAbsoluta(path, Astro.site ?? site.dominio);
+const og = urlAbsoluta(ogImagem, Astro.site ?? site.dominio);
+
+/* ---- Organization: alimenta o painel de conhecimento e a busca por marca.
+   Campos PENDENTE sao OMITIDOS do JSON-LD: schema.org com placeholder e pior
+   que schema.org ausente, porque vira dado estruturado errado indexado. */
+const org: Record<string, unknown> = {
+  '@type': 'Organization',
+  '@id': `${site.dominio}/#organization`,
+  name: 'Movvin',
+  url: site.dominio,
+  logo: urlAbsoluta("/img/logo-h-verde.png", site.dominio),
+  description: 'Mobilidade eletrica urbana. Bikes, scooters e triciclos eletricos com a classificacao legal declarada por modelo.',
+  areaServed: { '@type': 'Country', name: 'Brasil' },
+};
+if (!estaPendente(site.razaoSocial)) org.legalName = site.razaoSocial;
+if (!estaPendente(site.cnpj)) org.taxID = site.cnpj;
+if (!estaPendente(site.endereco)) {
+  org.address = {
+    '@type': 'PostalAddress',
+    streetAddress: site.endereco,
+    addressLocality: estaPendente(site.cidade) ? undefined : site.cidade,
+    addressRegion: estaPendente(site.uf) ? undefined : site.uf,
+    postalCode: estaPendente(site.cep) ? undefined : site.cep,
+    addressCountry: 'BR',
+  };
+}
+if (!estaPendente(site.sac)) {
+  org.contactPoint = {
+    '@type': 'ContactPoint',
+    contactType: 'customer service',
+    telephone: site.sac,
+    areaServed: 'BR',
+    availableLanguage: 'Portuguese',
+  };
+}
+
+const websiteLd = {
+  '@type': 'WebSite',
+  '@id': `${site.dominio}/#website`,
+  url: site.dominio,
+  name: 'Movvin',
+  inLanguage: 'pt-BR',
+  publisher: { '@id': `${site.dominio}/#organization` },
+};
+
+const grafo = { '@context': 'https://schema.org', '@graph': [org, websiteLd, ...jsonLd] };
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>{titulo}</title>
+    <meta name="description" content={descricao} />
+    <link rel="canonical" href={canonical} />
+
+    {/* Sem isso os inputs ficam brancos no Windows e a barra do browser destoa. */}
+    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="color-scheme" content="dark" />
+
+    {/* A fonte de display e o LCP tipografico do hero. */}
+    <link rel="preload" href={asset("/fonts/archivo-var.woff2")} as="font" type="font/woff2" crossorigin />
+
+    <link rel="icon" href={asset("/favicon.svg")} type="image/svg+xml" />
+    <link rel="apple-touch-icon" href={asset("/img/simbolo.png")} />
+    <link rel="sitemap" href={asset("/sitemap-index.xml")} />
+
+    {/* ---- Open Graph / social ---- */}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Movvin" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:title" content={titulo} />
+    <meta property="og:description" content={descricao} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={og} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={titulo} />
+    <meta name="twitter:description" content={descricao} />
+    <meta name="twitter:image" content={og} />
+
+    {/* ---- Indexacao ----
+        max-snippet=-1 e max-image-preview=large importam para GEO: motores de
+        resposta citam trechos longos, e a tabela do Anexo I e o ativo citavel. */}
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="author" content="Movvin" />
+    <meta name="geo.region" content="BR" />
+
+    {/* ---- Referencia normativa legivel por maquina ---- */}
+    <meta name="citation_reference" content={`${norma.ref} (${norma.publicada})`} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(grafo)} is:inline />
+  </head>
+
+  <body>
+    <a href="#conteudo" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-4 focus:rounded-lg focus:bg-mv-green-500 focus:px-4 focus:py-3 focus:font-semibold focus:text-mv-bg">
+      Pular para o conteudo
+    </a>
+    <slot />
+
+    {/* Reveal por IntersectionObserver. Nunca listener de scroll. */}
+    <script is:inline>
+      (() => {
+        const reduz = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        /* --- reveals --- */
+        const alvos = document.querySelectorAll('.mv-reveal');
+        if (alvos.length) {
+          if (reduz) {
+            alvos.forEach((el) => el.setAttribute('data-shown', ''));
+          } else {
+            const io = new IntersectionObserver(
+              (es) => {
+                es.forEach((e) => {
+                  if (!e.isIntersecting) return;
+                  e.target.setAttribute('data-shown', '');
+                  io.unobserve(e.target);
+                });
+              },
+              { rootMargin: '0px 0px -8% 0px', threshold: 0.05 },
+            );
+            alvos.forEach((el) => io.observe(el));
+          }
+        }
+
+        /* --- videos das faixas ---
+           preload="none" + IO. O play() so pode ser chamado quando ja existe
+           dado decodificado: chamar logo apos load() rejeita a promise em
+           silencio e o video fica parado no poster (era o bug). */
+        const videos = document.querySelectorAll('video[data-mv-lazyvideo]');
+        if (!videos.length || reduz) return;
+
+        /* GUARD DE REDE. Os 3 videos somam ~2,2 MB de decoracao. O publico
+           primario e entregador em 4G com franquia contada: baixar isso sem
+           perguntar e gastar o dado dele num efeito. Com Economia de Dados
+           ligada, ou em 2g/3g, o poster fica e o video nunca desce. A pagina
+           nao perde nada: o poster ja e o frame que interessa. */
+        const rede = navigator.connection;
+        const redeFraca =
+          !!rede && (rede.saveData === true || /^(slow-)?2g$|^3g$/.test(rede.effectiveType || ''));
+        if (redeFraca) return;
+
+        const tocar = (v) => {
+          const p = v.play();
+          if (p && typeof p.catch === 'function') p.catch(() => {});
+        };
+
+        const ioVid = new IntersectionObserver(
+          (es) => {
+            es.forEach((e) => {
+              const v = e.target;
+              if (!e.isIntersecting) {
+                if (v.dataset.mvPronto) v.pause();
+                return;
+              }
+              if (!v.dataset.mvIniciado) {
+                v.dataset.mvIniciado = '1';
+                v.addEventListener(
+                  'loadeddata',
+                  () => {
+                    v.dataset.mvPronto = '1';
+                    tocar(v);
+                  },
+                  { once: true },
+                );
+                v.load();
+                return;
+              }
+              if (v.dataset.mvPronto) tocar(v);
+            });
+          },
+          { threshold: 0.15 },
+        );
+        videos.forEach((v) => ioVid.observe(v));
+      })();
+    </script>
+  </body>
+</html>

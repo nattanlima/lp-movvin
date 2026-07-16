@@ -1,0 +1,225 @@
+---
+import Logo from './Logo.astro';
+import { linkWhatsApp } from '../lib/site';
+import { rota } from '../lib/url';
+
+/* ============================================================================
+ * Barra, nao secao. Logo CENTRALIZADA no desktop, navegacao a direita.
+ * Grid de 3 colunas iguais: e o que mantem a logo no centro OTICO da tela,
+ * e nao no centro do espaco que sobrou entre os dois lados. Com flex +
+ * justify-between a logo escorrega para a esquerda assim que a nav cresce.
+ *
+ * A sombra do sticky entra por IntersectionObserver num sentinel de 1px, e
+ * nunca por listener de scroll (jank na main thread). O comentario mora aqui,
+ * no frontmatter, e nao dentro do <script is:inline>: o Astro nao minifica
+ * script inline, entao comentario la dentro viaja pro HTML de producao.
+ *
+ * >>> MENU DO CELULAR: <details>, DE PROPOSITO, SEM UMA LINHA DE JS <<<
+ * Antes nao existia navegacao nenhuma no mobile: "Conheca a linha", "Nossa
+ * historia" e "Suporte" eram todos hidden sm:, e sobrava logo + "Compre
+ * agora". Duas paginas do site eram inalcancaveis pelo celular.
+ * O <details>/<summary> ja e um disclosure nativo: abre e fecha sem JS, tem
+ * papel e estado de ARIA de graca, e funciona com teclado e leitor de tela
+ * sem eu escrever nada. Um drawer em JS custaria bytes e reinventaria isso
+ * pior. A partir de sm ele some e a nav horizontal volta.
+ * ========================================================================== */
+
+/* rota() em cada href: a lista mistura ancora e rota interna, e so a rota
+   leva o base. Ver src/lib/url.ts. */
+const LINKS = [
+  { href: rota('#linha'), texto: 'Conheça a linha' },
+  { href: rota('/nossa-historia'), texto: 'Nossa história' },
+  { href: rota('/suporte'), texto: 'Suporte' },
+];
+---
+
+<div id="mv-sentinel" aria-hidden="true" class="absolute top-[400px] h-px w-full"></div>
+
+<header
+  id="mv-header"
+  class="sticky top-0 z-40 border-b border-transparent transition-[background-color,border-color,backdrop-filter] duration-300"
+>
+  <nav
+    class="mv-container flex h-16 items-center justify-between gap-3 sm:grid sm:h-20 sm:grid-cols-[1fr_auto_1fr]"
+    aria-label="Principal"
+  >
+    <div class="hidden justify-self-start sm:block">
+      <a
+        href="#linha"
+        class="text-sm font-medium whitespace-nowrap text-mv-text-2 transition-colors hover:text-mv-green-500"
+        data-mv-event="nav"
+        data-mv-valor="linha"
+      >
+        Conheça a linha
+      </a>
+    </div>
+
+    {/* min-h-11 (44px): a logo e um link e tinha 34px de altura, abaixo do
+        minimo de toque. O -ml-1 devolve o alinhamento otico com a borda. */}
+    <a
+      href={rota("/")}
+      class="-ml-1 flex min-h-11 items-center rounded-sm px-1 sm:justify-self-center"
+      aria-label="Movvin, página inicial"
+    >
+      <Logo />
+    </a>
+
+    <div class="flex items-center gap-3 sm:justify-self-end sm:gap-6">
+      {
+        LINKS.slice(1).map((l) => (
+          <a
+            href={l.href}
+            class="hidden text-sm font-medium whitespace-nowrap text-mv-text-2 transition-colors hover:text-mv-green-500 sm:inline"
+          >
+            {l.texto}
+          </a>
+        ))
+      }
+
+      {/* O CTA some no celular: logo + "Compre agora" + hamburguer nao cabem
+          em 390px e o botao passava POR CIMA da logo (virava "movvi"). O CTA
+          vive dentro do menu, e o hero ja tem os dois botoes na primeira
+          dobra: ninguem fica sem caminho de compra. */}
+      <a
+        href="#linha"
+        class="mv-btn mv-btn-primary group hidden h-10 min-h-0 gap-2 px-5 text-sm whitespace-nowrap sm:inline-flex"
+        data-mv-event="cta-header"
+      >
+        Compre agora
+        <span
+          aria-hidden="true"
+          class="flex h-5 w-5 items-center justify-center rounded-full border border-mv-bg/35 text-[0.7rem] leading-none transition-transform duration-300 group-hover:rotate-90"
+          style="transition-timing-function: var(--ease-mv);">+</span
+        >
+      </a>
+
+      {/* Menu do celular. Some a partir de sm. */}
+      <details class="mv-menu relative sm:hidden">
+        <summary
+          class="flex h-11 w-11 cursor-pointer list-none items-center justify-center rounded-xl border border-mv-border-strong text-mv-text-1"
+          aria-label="Abrir menu"
+        >
+          <span class="mv-menu-icone" aria-hidden="true"></span>
+        </summary>
+
+        <div
+          class="absolute right-0 z-50 mt-3 w-60 overflow-hidden rounded-2xl border border-mv-border bg-mv-surface-1 shadow-2xl backdrop-blur-md"
+        >
+          <ul class="flex flex-col p-2">
+            {
+              [...LINKS, { href: rota('/revendedor'), texto: 'Revendedor' }, { href: rota('#faq'), texto: 'Perguntas' }].map((l) => (
+                <li>
+                  <a
+                    href={l.href}
+                    class="flex min-h-12 items-center rounded-xl px-4 text-[0.95rem] font-medium text-mv-text-1 transition-colors hover:bg-mv-surface-2 hover:text-mv-green-500"
+                    data-mv-event="nav-mobile"
+                    data-mv-valor={l.texto}
+                  >
+                    {l.texto}
+                  </a>
+                </li>
+              ))
+            }
+            <li class="mt-1 border-t border-mv-border pt-2">
+              <a
+                href={linkWhatsApp({ tipo: 'geral' })}
+                class="flex min-h-12 items-center rounded-xl px-4 text-[0.95rem] font-semibold text-mv-green-500"
+                data-mv-event="whatsapp"
+                data-mv-valor="menu"
+                rel="nofollow"
+              >
+                Falar no WhatsApp
+              </a>
+            </li>
+          </ul>
+        </div>
+      </details>
+    </div>
+  </nav>
+</header>
+
+<style>
+  #mv-header[data-fixo] {
+    background-color: color-mix(in srgb, var(--color-mv-bg) 78%, transparent);
+    border-bottom-color: var(--color-mv-border);
+    backdrop-filter: blur(12px);
+  }
+
+  /* O Safari precisa dos dois pra tirar o triangulo do summary. */
+  .mv-menu summary::-webkit-details-marker {
+    display: none;
+  }
+  .mv-menu summary::marker {
+    content: '';
+  }
+
+  /* Hamburguer em CSS puro: 3 linhas, sem SVG e sem icon font. */
+  .mv-menu-icone,
+  .mv-menu-icone::before,
+  .mv-menu-icone::after {
+    display: block;
+    width: 18px;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+    transition: transform 240ms var(--ease-mv);
+  }
+  .mv-menu-icone::before,
+  .mv-menu-icone::after {
+    content: '';
+    position: relative;
+  }
+  .mv-menu-icone::before {
+    top: -6px;
+  }
+  .mv-menu-icone::after {
+    top: 4px;
+  }
+  /* Aberto: vira X. O do meio some, os outros cruzam. */
+  .mv-menu[open] .mv-menu-icone {
+    background: transparent;
+  }
+  .mv-menu[open] .mv-menu-icone::before {
+    transform: translateY(6px) rotate(45deg);
+  }
+  .mv-menu[open] .mv-menu-icone::after {
+    transform: translateY(-4px) rotate(-45deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mv-menu-icone,
+    .mv-menu-icone::before,
+    .mv-menu-icone::after {
+      transition: none;
+    }
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    const s = document.getElementById('mv-sentinel');
+    const h = document.getElementById('mv-header');
+    if (s && h) {
+      new IntersectionObserver(
+        ([e]) => (e.isIntersecting ? h.removeAttribute('data-fixo') : h.setAttribute('data-fixo', '')),
+        { threshold: 0 },
+      ).observe(s);
+    }
+
+    /* O <details> nao fecha sozinho ao clicar num item nem ao tocar fora.
+       Sem isto, o usuario toca em "Suporte", a ancora rola, e o menu fica
+       aberto por cima do conteudo. Sao 8 linhas; um drawer em JS seria o
+       componente inteiro. */
+    const menu = document.querySelector('.mv-menu');
+    if (!menu) return;
+    menu.addEventListener('click', (e) => {
+      if (e.target.closest('a')) menu.removeAttribute('open');
+    });
+    document.addEventListener('click', (e) => {
+      if (menu.hasAttribute('open') && !menu.contains(e.target)) menu.removeAttribute('open');
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') menu.removeAttribute('open');
+    });
+  })();
+</script>

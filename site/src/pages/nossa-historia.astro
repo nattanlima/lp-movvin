@@ -1,0 +1,76 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site, linkWhatsApp } from '../lib/site';
+
+/* ============================================================================
+ * NOSSA HISTORIA
+ * ----------------------------------------------------------------------------
+ * O header linka /nossa-historia. Sem esta pagina, 404.
+ *
+ * >>> TEXTO PROVISORIO, E ISSO E DELIBERADO <<<
+ * Ninguem me contou a historia da Movvin: nao ha data de fundacao, nao ha
+ * fundador, nao ha "por que a gente comecou". Escrever isso de cabeca seria
+ * inventar o passado de uma empresa real, que e o tipo de ficcao que volta pra
+ * assombrar (imprensa, investidor, o proprio time lendo e nao reconhecendo).
+ *
+ * O que esta aqui e SO o que a pagina inteira ja sustenta: onde a empresa
+ * fica, o que ela vende e como o nome dos produtos funciona. Nada de "desde
+ * 20XX", nada de "nascemos do sonho de", nada de numero de clientes.
+ * Trocar por texto real assim que o cliente contar a historia.
+ * ========================================================================== */
+---
+
+<Base
+  titulo="Nossa história | Movvin"
+  descricao="A Movvin nasceu pra tirar a cidade do combustível. Bike, scooter e triciclo elétrico feitos pra rua brasileira."
+  path="/nossa-historia"
+>
+  <Header />
+  <main>
+    <section class="mv-section">
+      <div class="mv-container">
+        <p class="mv-eyebrow">Nossa história.</p>
+        <h1 class="mv-display mv-h2 mt-6 max-w-[15ch] text-mv-text-1">
+          A gente move <span class="text-mv-green-500">o que trava.</span>
+        </h1>
+
+        <div class="mt-10 max-w-[58ch] space-y-6 text-lg leading-relaxed text-mv-text-2">
+          <p>
+            A Movvin faz veículo elétrico para a cidade brasileira. Bike, scooter e triciclo, todos 100%
+            elétricos, todos pensados para o trajeto que se repete todo dia: o mercado, a escola, a entrega, a
+            farmácia.
+          </p>
+          <p>
+            O nome de cada modelo diz o que ele é. Todo modelo começa com <strong class="text-mv-text-1"
+              translate="no">MV</strong
+            >, de Movvin, e a letra seguinte é a categoria: <strong class="text-mv-text-1">B</strong> de bike,
+            <strong class="text-mv-text-1">S</strong> de scooter, <strong class="text-mv-text-1">T</strong> de
+            triciclo. O número é o sequencial. Sem nome de fantasia, sem linha de sabor.
+          </p>
+          <p>
+            A gente fica em {site.cidade}, {site.uf}, e atende pelo WhatsApp: você diz para que vai usar e a
+            gente indica o modelo.
+          </p>
+        </div>
+
+        <a
+          href={linkWhatsApp({ tipo: 'geral' })}
+          class="mv-btn mv-btn-primary group mt-10 gap-2.5"
+          data-mv-event="whatsapp"
+          data-mv-valor="historia"
+          rel="nofollow"
+        >
+          Falar no WhatsApp
+          <span
+            aria-hidden="true"
+            class="flex h-6 w-6 items-center justify-center rounded-full border border-mv-bg/35 text-xs transition-transform duration-300 group-hover:translate-x-0.5"
+            style="transition-timing-function: var(--ease-mv);">→</span
+          >
+        </a>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Base>

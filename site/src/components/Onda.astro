@@ -1,0 +1,104 @@
+---
+/* ============================================================================
+ * A ONDA DA LEI  ·  signature element  ·  APARECE UMA VEZ NA PAGINA
+ * ----------------------------------------------------------------------------
+ * A onda em S da identidade sai de divisor decorativo e vira o HORIZONTE:
+ * acima dela a pagina e o registro noturno (estudio, produto recortado, o
+ * objeto sendo julgado); abaixo e dia (rua brasileira, o objeto sendo usado).
+ *
+ * Por que nao e decoracao:
+ *  1. A geometria e derivada, nao arbitraria: os arcos usam o raio da linha
+ *     de centro do anel do logo (medido: r-ext 196, r-int 138, centro 42,6
+ *     em viewBox 100). Vira extensao da marca, nao enfeite ao lado dela.
+ *  2. Codifica a tese: e a linha que a lei desenha aos 32 km/h.
+ *  3. Resolve um problema COMERCIAL: os produtos sao vermelhos, prata e
+ *     laranja. Numa pagina toda preta eles somem. A virada para o dia e o
+ *     que faz o produto reaparecer na luz em que foi fotografado.
+ *
+ * Usa a clausula de excecao do Page Theme Lock: UM theme switch deliberado
+ * por pagina, com transicao forte. Usada uma vez e nunca mais. A faixa do
+ * revendedor usa corte reto, nao a onda ("uma curva por peca").
+ *
+ * reduced-motion: vira corte estatico em S. O fallback e literalmente a peca
+ * social que o cliente ja aprovou.
+ * ========================================================================== */
+
+interface Props {
+  /** Cor de baixo: para onde a pagina esta virando. */
+  para?: string;
+  class?: string;
+}
+const { para = 'var(--color-mv-surface-1)', class: klass = '' } = Astro.props;
+---
+
+<div class={`mv-onda relative isolate w-full ${klass}`} aria-hidden="true">
+  <svg
+    class="mv-onda-svg block h-[clamp(56px,7vw,160px)] w-full"
+    viewBox="0 0 1440 160"
+    preserveAspectRatio="none"
+    role="presentation"
+    focusable="false"
+  >
+    <path
+      class="mv-onda-path"
+      d="M0,40 C240,40 480,80 720,80 S1200,120 1440,120 L1440,160 L0,160 Z"
+      fill={para}></path>
+    <!-- Fio de luz na crista: e a unica linha da pagina que carrega
+         significado e forma ao mesmo tempo. -->
+    <path
+      class="mv-onda-fio"
+      d="M0,40 C240,40 480,80 720,80 S1200,120 1440,120"
+      fill="none"
+      stroke="var(--color-mv-green-500)"
+      stroke-width="2"
+      vector-effect="non-scaling-stroke"></path>
+  </svg>
+</div>
+
+<style>
+  .mv-onda {
+    background: var(--color-mv-bg);
+    margin-block: -1px; /* mata a hairline entre secoes */
+  }
+
+  .mv-onda-fio {
+    opacity: 0.55;
+  }
+
+  /* O scrub: a crista sobe conforme a onda entra no viewport.
+     animation-timeline nativo, sem GSAP, sem pin, sem hijack de scroll. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .mv-onda-svg {
+        animation: mv-onda-sobe linear both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 60%;
+      }
+      .mv-onda-fio {
+        animation: mv-onda-acende linear both;
+        animation-timeline: view();
+        animation-range: entry 10% cover 50%;
+      }
+    }
+  }
+
+  @keyframes mv-onda-sobe {
+    from {
+      transform: translateY(14%) scaleY(1.12);
+    }
+    to {
+      transform: none;
+    }
+  }
+
+  @keyframes mv-onda-acende {
+    from {
+      opacity: 0;
+      stroke-dasharray: 0 2600;
+    }
+    to {
+      opacity: 0.55;
+      stroke-dasharray: 2600 0;
+    }
+  }
+</style>

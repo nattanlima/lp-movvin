@@ -1,0 +1,78 @@
+---
+import { getCollection } from 'astro:content';
+import CardModelo from './CardModelo.astro';
+import FlowingMenu from './FlowingMenu.astro';
+
+const modelos = (await getCollection('modelos', ({ data }) => data.publicado)).sort(
+  (a, b) => a.data.ordem - b.data.ordem,
+);
+
+/* MVH-01 fica FORA ate a letra da categoria e a spec serem confirmadas.
+   MVB-03 e MVB-04 nao constam da nomenclatura do cliente: oferta sobre
+   produto nao confirmado e CDC arts. 30, 35 e 39, IX. */
+
+/* Os 4 usos do briefing original, cada um caindo no modelo que serve pra ele.
+   O destino nao e o topo do grid: e o CARD, senao o clique promete um modelo
+   e entrega uma lista pra pessoa procurar. */
+const USOS = [
+  {
+    texto: 'Trabalhar e entregar',
+    href: '#modelo-mvs-02',
+    imagem: 'uso-trabalho',
+    alt: 'Homem pilotando uma bike elétrica preta de pneu largo por uma praça arborizada',
+  },
+  {
+    texto: 'Meu dia a dia',
+    href: '#modelo-mvb-01',
+    imagem: 'uso-dia',
+    alt: 'Homem colocando sacola de compras no cesto de uma bike elétrica azul na frente de um mercado',
+  },
+  {
+    texto: 'Mais apoio e conforto',
+    href: '#modelo-mvt-03',
+    imagem: 'uso-apoio',
+    alt: 'Senhora ajustando o capacete ao lado de uma bike elétrica vermelha com as compras no cesto',
+  },
+  {
+    texto: 'Ir pra escola',
+    href: '#modelo-mvs-01',
+    imagem: 'uso-escola',
+    alt: 'Mãe e filha de capacete em uma scooter elétrica vermelha, a menina com mochila nas costas',
+  },
+];
+---
+
+<section id="linha" class="scroll-mt-20">
+  {/* Ocupa a tela inteira: o menu de usos e a primeira decisao que a pagina
+      pede depois do hero, e dividir atencao com os cards aqui derrubaria as
+      duas coisas. Os cards vem logo abaixo, no proprio scroll.
+      O container fica no CABECALHO, nao aqui: o menu precisa sangrar ate a
+      borda da tela e nao pode nascer dentro de uma caixa com max-width. */}
+  {/* O respiro e generoso de proposito: o bloco de texto e a unica pausa
+      entre o hero e uma lista de 4 itens em tipografia grande. Apertado, ele
+      lia como legenda do menu em vez de abertura da secao. */}
+  <div class="flex min-h-[calc(100svh-5rem)] flex-col justify-center py-24 sm:py-32">
+    <div class="mv-container mv-reveal">
+      <p class="mv-eyebrow">A linha.</p>
+
+      <h2 class="mv-display mv-h2 mt-7 max-w-[16ch] text-mv-text-1">
+        Mova <span class="text-mv-green-500">diferente.</span>
+      </h2>
+
+      <p class="mt-8 max-w-[52ch] text-lg leading-relaxed text-mv-text-2">
+        Bike, scooter ou triciclo. Escolhe pra que você vai usar e a gente te leva direto no modelo.
+      </p>
+    </div>
+
+    <FlowingMenu itens={USOS} class="mv-reveal mt-20 flex-1 sm:mt-28" />
+  </div>
+
+  {/* Os cards. Stagger: entram em cascata, nao todos de uma vez. O atraso e
+      por indice e para em 5 (--mv-i), senao o ultimo card de uma linha longa
+      demoraria a aparecer depois de ja estar visivel. */}
+  <div class="mv-container pt-8 pb-24 sm:pt-12 sm:pb-32">
+    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {modelos.map((m, i) => <CardModelo modelo={m.data} indice={i} />)}
+    </div>
+  </div>
+</section>

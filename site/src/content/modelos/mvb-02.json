@@ -1,0 +1,31 @@
+{
+  "codigo": "MVB-02",
+  "nome": "MVB-02",
+  "categoria": "bike",
+  "categoriaLabel": "Bike elétrica",
+  "ordem": 2,
+  "triade": [
+    "URBANA",
+    "DIRETA",
+    "100% ELÉTRICA."
+  ],
+  "chamada": "A cidade sem barulho.",
+  "potenciaW": 1000,
+  "velocidadeMaximaKmh": 35,
+  "rodas": 2,
+  "oQueE": "Pneu largo, postura ereta e estabilidade em asfalto ruim. Feita pra rua brasileira.",
+  "beneficios": [
+    "Pneu largo: buraco e paralelepípedo sem susto",
+    "Motor de 1.000 W: sobe ladeira sem perder fôlego",
+    "Painel LCD e NFC"
+  ],
+  "usos": [
+    "dia-a-dia",
+    "trabalho"
+  ],
+  "imagem": "/img/mvb-02",
+  "imagemAlt": "MVB-02: bike elétrica preta de pneu largo, com guidão alto e banco alongado",
+  "largura": 900,
+  "altura": 918,
+  "publicado": true
+}

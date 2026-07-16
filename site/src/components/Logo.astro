@@ -1,0 +1,47 @@
+---
+import { asset } from '../lib/url';
+
+/* O simbolo em SVG, com a geometria MEDIDA no asset original (3.png):
+   anel r-ext 196, r-int 138 -> espessura = 29,6% do raio externo.
+   O fade do topo-esquerdo NAO e um degrade branco->verde: e um ramp de
+   OPACIDADE sobre cor constante. Reproduzir como linear-gradient(white,green)
+   fica errado sobre fundo escuro. Por isso o gradiente abaixo varia so o
+   stop-opacity, nunca a cor.
+   TODO: a wordmark ainda e PNG. Redesenhar em SVG antes do go-live. */
+interface Props {
+  class?: string;
+  cor?: string;
+}
+const { class: klass = '', cor = 'var(--color-mv-green-500)' } = Astro.props;
+const id = 'mvfade-' + Math.random().toString(36).slice(2, 8);
+---
+
+<span class={`inline-flex items-center gap-2.5 ${klass}`}>
+  <svg viewBox="0 0 100 100" class="h-7 w-7 shrink-0" role="img" aria-label="Movvin" focusable="false">
+    <defs>
+      <linearGradient id={id} x1="0" y1="0" x2="0.75" y2="0.9">
+        <stop offset="0" stop-color={cor} stop-opacity="0.18"></stop>
+        <stop offset="0.42" stop-color={cor} stop-opacity="1"></stop>
+      </linearGradient>
+    </defs>
+    <!-- anel aberto: r-ext 196/392*100 = 50, r-int 138/392*100 = 35,2
+         linha de centro r = 42,6 · espessura 14,8 -->
+    <path
+      d="M50 7.4a42.6 42.6 0 1 1-42.6 42.6"
+      fill="none"
+      stroke={`url(#${id})`}
+      stroke-width="14.8"
+      stroke-linecap="butt"></path>
+    <!-- raio -->
+    <path d="M54.5 22 34 51.5h15.5L45.5 78 66 48.5H50.5z" fill={cor}></path>
+  </svg>
+  <img
+    src={asset("/img/wordmark-verde.png")}
+    alt=""
+    width="112"
+    height="17"
+    class="h-[17px] w-auto"
+    fetchpriority="high"
+    decoding="async"
+  />
+</span>
