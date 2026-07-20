@@ -17,10 +17,10 @@ export const estaPendente = (v: string) => v === PENDENTE;
 
 export const site = {
   nome: 'Movvin',
-  /* Onde o site MORA hoje. Alimenta os @id do JSON-LD e a URL absoluta do OG.
-     Quando o dominio proprio existir, troca aqui E no astro.config.mjs (site +
-     base). Sao os dois unicos lugares. */
-  dominio: 'https://nattanlima.github.io/lp-movvin',
+  /* Onde o site MORA. Alimenta os @id do JSON-LD e a URL absoluta do OG.
+     Dominio proprio (apex). Se mudar, troca aqui E no astro.config.mjs (site).
+     Sao os dois unicos lugares. */
+  dominio: 'https://movvin.com.br',
 
   /* ---- Identificacao legal (CDC art. 6, III) --------------------------
      CNPJ conferido pelo digito verificador: 67.098.455/0001-62 e valido. */
