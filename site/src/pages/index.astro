@@ -96,12 +96,12 @@ const listaModelos = {
 };
 ---
 
-{/* Title com o termo de busca na frente, marca atras: ninguem busca "Movvin"
-    ainda. Quem procura o produto busca "bike eletrica", "scooter eletrica",
-    "triciclo eletrico". A descricao carrega os termos da consulta e o
-    beneficio, nao o slogan. */}
+{/* Marca na frente, por decisao do cliente. O SEO puro preferiria o termo de
+    busca primeiro ("bike eletrica", "scooter eletrica", "triciclo eletrico"),
+    ja que quase ninguem busca "Movvin" ainda; por isso a descricao abaixo segue
+    carregando esses termos, pra nao perder a consulta. */}
 <Base
-  titulo="Bike, scooter e triciclo elétrico | Movvin"
+  titulo="Movvin | Bike, scooter e triciclo elétrico"
   descricao="Bikes, scooters e triciclos 100% elétricos. Carrega na tomada de casa, sem combustível e sem barulho. Painel LCD e NFC. Conheça a linha Movvin e fale com a gente no WhatsApp."
   path="/"
   jsonLd={[faq, breadcrumb, listaModelos]}
