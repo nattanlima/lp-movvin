@@ -1,0 +1,32 @@
+{
+  "codigo": "MVS-HL1",
+  "nome": "MVS-HL1",
+  "categoria": "scooter",
+  "categoriaLabel": "Scooter elétrica",
+  "ordem": 9,
+  "triade": [
+    "COMPACTA",
+    "ESTILOSA",
+    "100% ELÉTRICA."
+  ],
+  "chamada": "Compacta com jeito de custom.",
+  "potenciaW": 1000,
+  "velocidadeMaximaKmh": 32,
+  "rodas": 2,
+  "oQueE": "Pneu largo, guidão alto e banco caramelo com encosto: estilo custom em tamanho de cidade.",
+  "beneficios": [
+    "Suspensão nas duas rodas",
+    "Freio a disco",
+    "Cartão NFC e painel LCD",
+    "Farol de LED"
+  ],
+  "usos": [
+    "dia-a-dia",
+    "escola"
+  ],
+  "imagem": "/img/mvs-hl1",
+  "imagemAlt": "MVS-HL1: scooter elétrica preta estilo custom, de pneus largos, com farol redondo e banco caramelo com encosto",
+  "largura": 900,
+  "altura": 869,
+  "publicado": true
+}

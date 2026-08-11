@@ -1,0 +1,31 @@
+{
+  "codigo": "MVS-SPARK",
+  "nome": "MVS Spark",
+  "categoria": "scooter",
+  "categoriaLabel": "Scooter elétrica",
+  "ordem": 6,
+  "triade": [
+    "FORTE",
+    "DE TRABALHO",
+    "100% ELÉTRICA."
+  ],
+  "chamada": "Feita pra rodar o dia inteiro.",
+  "potenciaW": 1000,
+  "velocidadeMaximaKmh": 32,
+  "rodas": 2,
+  "oQueE": "Grade de proteção e bagageiro de fábrica: estrutura pra aguentar o turno inteiro de entrega.",
+  "beneficios": [
+    "Capacidade de carga de 200 kg",
+    "Freio a disco e farol de LED",
+    "Zero combustível, zero troca de óleo",
+    "Painel digital e cartão NFC"
+  ],
+  "usos": [
+    "trabalho"
+  ],
+  "imagem": "/img/mvs-spark",
+  "imagemAlt": "MVS Spark: scooter elétrica branca com grades de proteção pretas na frente e atrás e faróis duplos de LED",
+  "largura": 900,
+  "altura": 1477,
+  "publicado": true
+}

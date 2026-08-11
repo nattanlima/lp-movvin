@@ -27,8 +27,8 @@ const { modelo: m, indice = 0 } = Astro.props;
       Alinhar pela base poe todas as rodas na mesma linha de chao de graca.
       Escalar por ALTURA, nunca por largura: os aspect-ratios divergem. */}
   <div class="relative flex h-52 items-end justify-center overflow-hidden bg-mv-surface-2 px-6 pt-6 sm:h-60">
-    {/* Refletor: MVB-02 e MVT-03 sao pretos e encostam no fundo do card sem
-        isto. E o que faz a silhueta existir. */}
+    {/* Refletor: MVB-EB8, MVB-RSE e MVS-HL1 sao pretos e encostam no fundo do
+        card sem isto. E o que faz a silhueta existir. */}
     <div
       aria-hidden="true"
       class="pointer-events-none absolute inset-0"
@@ -73,7 +73,9 @@ const { modelo: m, indice = 0 } = Astro.props;
 
   <div class="flex flex-1 flex-col p-5 sm:p-6">
     <div class="flex items-baseline justify-between gap-3">
-      <h3 class="font-display text-2xl font-black tracking-tight text-mv-text-1" translate="no">{m.codigo}</h3>
+      {/* nome, nao codigo: a linha 2026 tem modelos batizados ("MVS Itália")
+          cujo codigo interno ("MVS-ITALIA") perde o acento e grita na tela. */}
+      <h3 class="font-display text-2xl font-black tracking-tight text-mv-text-1" translate="no">{m.nome}</h3>
       <span class="text-xs font-medium text-mv-text-3">{m.categoriaLabel}</span>
     </div>
 
@@ -122,7 +124,7 @@ const { modelo: m, indice = 0 } = Astro.props;
 
     <div class="mt-auto pt-6">
       <a
-        href={linkWhatsApp({ tipo: 'modelo', modelo: m.codigo })}
+        href={linkWhatsApp({ tipo: 'modelo', modelo: m.nome })}
         class="mv-btn mv-btn-primary w-full"
         data-mv-event="whatsapp"
         data-mv-valor={m.codigo}

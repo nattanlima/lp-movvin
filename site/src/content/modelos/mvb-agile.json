@@ -1,0 +1,32 @@
+{
+  "codigo": "MVB-AGILE",
+  "nome": "MVB Agile",
+  "categoria": "bike",
+  "categoriaLabel": "Bike elétrica",
+  "ordem": 1,
+  "triade": [
+    "LEVE",
+    "PRÁTICA",
+    "100% ELÉTRICA."
+  ],
+  "chamada": "Leve pro dia a dia.",
+  "potenciaW": 500,
+  "velocidadeMaximaKmh": 32,
+  "rodas": 2,
+  "oQueE": "Cesto na frente, quadro baixo e banco traseiro com encosto. Sobe e desce sem esforço.",
+  "beneficios": [
+    "Cesta na parte frontal: mercado e mochila vão junto",
+    "Painel LCD e alarme de série",
+    "3 velocidades pra escolher o ritmo",
+    "Em preto, rosé, azul ou vermelho"
+  ],
+  "usos": [
+    "dia-a-dia",
+    "escola"
+  ],
+  "imagem": "/img/mvb-agile",
+  "imagemAlt": "MVB Agile: bike elétrica azul de quadro baixo, com cesto de arame na frente e banco traseiro com encosto",
+  "largura": 900,
+  "altura": 636,
+  "publicado": true
+}

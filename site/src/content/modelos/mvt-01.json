@@ -1,0 +1,32 @@
+{
+  "codigo": "MVT-01",
+  "nome": "MVT-01",
+  "categoria": "triciclo",
+  "categoriaLabel": "Triciclo elétrico",
+  "ordem": 10,
+  "triade": [
+    "TRÊS RODAS",
+    "DE APOIO",
+    "100% ELÉTRICO."
+  ],
+  "chamada": "Três rodas, mais apoio.",
+  "potenciaW": 1000,
+  "velocidadeMaximaKmh": 32,
+  "rodas": 3,
+  "oQueE": "Dois bancos estofados, encosto e cesta na frente. Três rodas dão apoio permanente na parada.",
+  "beneficios": [
+    "Três rodas: apoio permanente quando para",
+    "Suporta até 300 kg",
+    "Corpo de aço carbono",
+    "Cesta frontal: a compra vai junto"
+  ],
+  "usos": [
+    "apoio",
+    "dia-a-dia"
+  ],
+  "imagem": "/img/mvt-01",
+  "imagemAlt": "MVT-01: triciclo elétrico bege com dois bancos estofados com encosto, cesta na frente e três rodas",
+  "largura": 900,
+  "altura": 788,
+  "publicado": true
+}

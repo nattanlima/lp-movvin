@@ -1,0 +1,32 @@
+{
+  "codigo": "MVB-RSE",
+  "nome": "MVB-RSE",
+  "categoria": "bike",
+  "categoriaLabel": "Bike elétrica",
+  "ordem": 3,
+  "triade": [
+    "MACIA",
+    "ESTÁVEL",
+    "100% ELÉTRICA."
+  ],
+  "chamada": "Conforto em rua de verdade.",
+  "potenciaW": 750,
+  "velocidadeMaximaKmh": 32,
+  "rodas": 2,
+  "oQueE": "Suspensão dianteira e traseira com freio hidráulico. Feita pro asfalto irregular da rua brasileira.",
+  "beneficios": [
+    "Suspensão dupla: buraco e lombada sem susto",
+    "Freio hidráulico: frenagem firme",
+    "Autonomia declarada de até 40 km por carga",
+    "Chave com alarme"
+  ],
+  "usos": [
+    "dia-a-dia",
+    "trabalho"
+  ],
+  "imagem": "/img/mvb-rse",
+  "imagemAlt": "MVB-RSE: bike elétrica preta de pneu largo, com banco alongado, suspensão dianteira e traseira e bagageiro",
+  "largura": 900,
+  "altura": 817,
+  "publicado": true
+}

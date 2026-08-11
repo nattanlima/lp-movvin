@@ -1,0 +1,32 @@
+{
+  "codigo": "MVS-FLASH",
+  "nome": "MVS Flash",
+  "categoria": "scooter",
+  "categoriaLabel": "Scooter elétrica",
+  "ordem": 8,
+  "triade": [
+    "ÁGIL",
+    "ESPORTIVA",
+    "100% ELÉTRICA."
+  ],
+  "chamada": "Agilidade pro trânsito de todo dia.",
+  "potenciaW": 1000,
+  "velocidadeMaximaKmh": 32,
+  "rodas": 2,
+  "oQueE": "Desenho esportivo, banco pra dois com encosto e marcha a ré pra sair de qualquer vaga.",
+  "beneficios": [
+    "Banco duplo com encosto pra garupa",
+    "3 velocidades e marcha a ré",
+    "Rodas de aço e freio a disco",
+    "Alarme e painel de LED"
+  ],
+  "usos": [
+    "dia-a-dia",
+    "trabalho"
+  ],
+  "imagem": "/img/mvs-flash",
+  "imagemAlt": "MVS Flash: scooter elétrica prata de desenho esportivo, com detalhes laranja e faróis afilados de LED",
+  "largura": 900,
+  "altura": 1191,
+  "publicado": true
+}

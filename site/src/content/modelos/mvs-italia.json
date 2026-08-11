@@ -1,0 +1,32 @@
+{
+  "codigo": "MVS-ITALIA",
+  "nome": "MVS Itália",
+  "categoria": "scooter",
+  "categoriaLabel": "Scooter elétrica",
+  "ordem": 5,
+  "triade": [
+    "CLÁSSICA",
+    "DE CHARME",
+    "100% ELÉTRICA."
+  ],
+  "chamada": "Estilo clássico pro dia a dia.",
+  "potenciaW": 1000,
+  "velocidadeMaximaKmh": 32,
+  "rodas": 2,
+  "oQueE": "Linhas clássicas, para-brisa e banco duplo com encosto pra garupa. O charme vai junto no trajeto.",
+  "beneficios": [
+    "Banco duplo: leva garupa com encosto",
+    "Suporta até 300 kg",
+    "Liga por aproximação com cartão NFC",
+    "Alarme e farol de LED"
+  ],
+  "usos": [
+    "dia-a-dia",
+    "escola"
+  ],
+  "imagem": "/img/mvs-italia",
+  "imagemAlt": "MVS Itália: scooter elétrica bege de linhas clássicas, com para-brisa, farol redondo e banco duplo com encosto",
+  "largura": 900,
+  "altura": 1066,
+  "publicado": true
+}

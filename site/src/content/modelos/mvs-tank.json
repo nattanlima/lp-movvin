@@ -1,0 +1,32 @@
+{
+  "codigo": "MVS-TANK",
+  "nome": "MVS Tank",
+  "categoria": "scooter",
+  "categoriaLabel": "Scooter elétrica",
+  "ordem": 7,
+  "triade": [
+    "ROBUSTA",
+    "ENCORPADA",
+    "100% ELÉTRICA."
+  ],
+  "chamada": "Enfrenta qualquer rua.",
+  "potenciaW": 1000,
+  "velocidadeMaximaKmh": 32,
+  "rodas": 2,
+  "oQueE": "Pneu cravejado, suspensão hidráulica e marcha a ré. Corpo robusto pra qualquer canto da cidade.",
+  "beneficios": [
+    "Suspensão hidráulica: conforto em piso ruim",
+    "3 velocidades e marcha a ré",
+    "Freio a disco e farol duplo de LED",
+    "Liga por aproximação com cartão NFC"
+  ],
+  "usos": [
+    "dia-a-dia",
+    "trabalho"
+  ],
+  "imagem": "/img/mvs-tank",
+  "imagemAlt": "MVS Tank: scooter elétrica cinza-esverdeada de visual robusto, com faróis redondos duplos e pneus cravejados",
+  "largura": 900,
+  "altura": 956,
+  "publicado": true
+}

@@ -1,0 +1,32 @@
+{
+  "codigo": "MVB-EB8",
+  "nome": "MVB-EB8",
+  "categoria": "bike",
+  "categoriaLabel": "Bike elétrica",
+  "ordem": 2,
+  "triade": [
+    "URBANA",
+    "DE DOIS LUGARES",
+    "100% ELÉTRICA."
+  ],
+  "chamada": "Leva você e mais um.",
+  "potenciaW": 750,
+  "velocidadeMaximaKmh": 32,
+  "rodas": 2,
+  "oQueE": "Pneu largo, quadro de alumínio e banco comprido: lugar pra garupa e estabilidade em asfalto ruim.",
+  "beneficios": [
+    "Autonomia declarada de até 40 km por carga",
+    "Quadro de alumínio: leve e não enferruja",
+    "Banco pra dois com bagageiro traseiro",
+    "Painel LCD e cartão NFC"
+  ],
+  "usos": [
+    "dia-a-dia",
+    "trabalho"
+  ],
+  "imagem": "/img/mvb-eb8",
+  "imagemAlt": "MVB-EB8: bike elétrica preta de pneu largo, com farol redondo, banco comprido pra dois e bagageiro traseiro",
+  "largura": 900,
+  "altura": 858,
+  "publicado": true
+}

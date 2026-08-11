@@ -12,7 +12,9 @@ import { glob } from 'astro/loaders';
  * que um claim de isencao entre por engano numa spec que nao o sustenta.
  * Res. CONTRAN 996/2023, art. 2, par. 6: acima de 32 km/h a classificacao como
  * ciclomotor e automatica, e ciclomotor exige registro + ACC ou CNH A.
- * A spec declarada e 35 km/h. Logo: nenhum campo de isencao pode ser marcado.
+ * O catalogo 2026 declara 32 km/h nos modelos novos e a MVS-01 declara 35 km/h.
+ * Nenhum modelo marca isencao: 32 km/h e o limite EXATO da regra e a isencao
+ * so entra com ficha tecnica assinada comprovando a velocidade de fabricacao.
  * ========================================================================== */
 
 const LIMITE_VELOCIDADE_ISENCAO = 32; // km/h — Art. 2, II "d" e III "d"
@@ -21,7 +23,9 @@ const modelos = defineCollection({
   loader: glob({ pattern: '**/*.json', base: './src/content/modelos' }),
   schema: z
     .object({
-      codigo: z.string().regex(/^MV[BSTH]-\d{2}$/, 'Nomenclatura: MV + categoria (B/S/T/H) + numero'),
+      codigo: z
+        .string()
+        .regex(/^MV[BSTH]-[A-Z0-9]+$/, 'Nomenclatura: MV + categoria (B/S/T/H) + identificador (numero ou nome)'),
       nome: z.string(),
       categoria: z.enum(['bike', 'scooter', 'triciclo', 'chopper']),
       categoriaLabel: z.string(),

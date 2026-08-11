@@ -105,7 +105,7 @@ export const norma = {
  *
  * A MENSAGEM E O CONTEXTO. Quem atende nao ve de onde a pessoa clicou, entao
  * a mensagem tem que dizer. Um "Ola" generico obriga o vendedor a comecar
- * perguntando o que a pessoa quer, e quem chegou olhando a MVS-02 ja
+ * perguntando o que a pessoa quer, e quem chegou olhando a MVS Spark ja
  * respondeu isso ao clicar. Cada CTA declara seu contexto no tipo abaixo:
  * assim e impossivel adicionar um botao novo e esquecer de contextualizar.
  *

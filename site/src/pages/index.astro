@@ -33,7 +33,7 @@ const faq = {
       name: 'Como funciona a nomenclatura dos modelos Movvin?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Todo modelo começa com MV, de Movvin, e a letra seguinte indica a categoria: B de bike, S de scooter e T de triciclo. O número é o sequencial dentro da categoria. Por exemplo: MVB-01 é a primeira bike, MVS-02 é a segunda scooter e MVT-03 é o triciclo.',
+        text: 'Todo modelo começa com MV, de Movvin, e a letra seguinte indica a categoria: B de bike, S de scooter e T de triciclo. Depois vem o nome ou número do modelo. Por exemplo: MVB Agile é uma bike, MVS Spark é uma scooter e MVT-01 é o triciclo.',
       },
     },
     {
@@ -65,7 +65,7 @@ const faq = {
       name: 'Qual a diferença entre a bike, a scooter e o triciclo da Movvin?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'A bike (MVB) é a mais leve e discreta, com quadro baixo e cesto, para trajeto curto de bairro. A scooter (MVS) tem carenagem e é mais robusta, para uso contínuo e dia inteiro na rua. O triciclo (MVT) tem três rodas, banco largo com encosto e apoio de braço, oferecendo apoio permanente quando para.',
+        text: 'A bike (MVB) é a mais leve e discreta, para o trajeto de todo dia. A scooter (MVS) tem carenagem e é mais robusta, para uso contínuo e dia inteiro na rua. O triciclo (MVT) tem três rodas, bancos com encosto e cesta na frente, oferecendo apoio permanente quando para.',
       },
     },
   ],
@@ -86,7 +86,7 @@ const listaModelos = {
     position: i + 1,
     item: {
       '@type': 'Product',
-      name: m.data.codigo,
+      name: m.data.nome,
       description: m.data.oQueE,
       image: `${site.dominio}${m.data.imagem}.png`,
       brand: { '@id': `${site.dominio}/#organization` },

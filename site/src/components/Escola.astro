@@ -8,12 +8,16 @@ import { linkWhatsApp } from '../lib/site';
  * O seletor oferece 4 usos; so 2 tinham bloco. Sem este, "Ir pra escola"
  * filtrava o grid e mandava o visitante pra lugar nenhum.
  *
- * Footage: mvs-02.mp4, mae numa MVS-02 VERMELHA (o modelo real, identico ao
- * mvs-02.png) buscando o filho na Escola Municipal. Video, produto e uso batem.
+ * Footage: mvb-01.mp4 (t=0.4..4.4), homem levando o carrinho do mercado ate a
+ * bike de cesto estacionada e acomodando a compra no cesto dianteiro.
+ * HISTORICO: ate 2026 esta faixa usava a cena da escola do mvs-02.mp4, mas a
+ * MVS-02 saiu da linha e nao existe footage de escola com modelo atual. A
+ * cena do mercado cobre a perna "passa no mercado" do proprio texto e mostra
+ * o cesto dianteiro, que e o argumento central da lista. A bike do video e a
+ * de cesto, o estilo vendido como MVB Agile: video, produto e CTA batem.
  *
- * O recorte e t=4..8: a cena da escola. Ficaram DE FORA de proposito os
- * ultimos segundos, em que ela roda numa rodovia rural. Bike eletrica em via
- * de transito rapido nao vai pra peca comercial.
+ * Ficou DE FORA de proposito o trecho t>4.5: a IA troca de bike no meio do
+ * video (aparece uma custom preta que nao e o mesmo produto).
  * ========================================================================== */
 ---
 
@@ -21,7 +25,7 @@ import { linkWhatsApp } from '../lib/site';
   id="escola"
   video="escola"
   lado="esquerda"
-  cena="Uma mãe estaciona a scooter elétrica vermelha em frente ao portão de uma escola municipal e coloca o capacete no filho."
+  cena="Um homem leva o carrinho de compras até a bike elétrica estacionada na porta do mercado e acomoda a sacola no cesto dianteiro."
 >
   <p class="mv-eyebrow">Pra levar e buscar.</p>
 
@@ -64,9 +68,8 @@ import { linkWhatsApp } from '../lib/site';
     >
       Falar no WhatsApp
     </a>
-    {/* Aponta para a MVS-02, que e o modelo que aparece no proprio video. */}
-    <a href="#modelo-mvs-02" class="mv-btn mv-btn-ghost" data-mv-event="ancora" data-mv-valor="MVS-02">
-      Ver a MVS-02
+    <a href="#modelo-mvb-agile" class="mv-btn mv-btn-ghost" data-mv-event="ancora" data-mv-valor="MVB-AGILE">
+      Ver a MVB Agile
     </a>
   </div>
   {/* A advertencia sobre transporte de crianca saiu daqui por decisao do

@@ -7,9 +7,9 @@ const modelos = (await getCollection('modelos', ({ data }) => data.publicado)).s
   (a, b) => a.data.ordem - b.data.ordem,
 );
 
-/* MVH-01 fica FORA ate a letra da categoria e a spec serem confirmadas.
-   MVB-03 e MVB-04 nao constam da nomenclatura do cliente: oferta sobre
-   produto nao confirmado e CDC arts. 30, 35 e 39, IX. */
+/* Linha 2026: 3 bikes (Agile, EB8, RSE), 6 scooters (MVS-01, Itália, Spark,
+   Tank, Flash, HL1) e o triciclo MVT-01. Specs vindas do "catálogo Movvin"
+   do cliente; so entra modelo que consta la (CDC arts. 30, 35 e 39, IX). */
 
 /* Os 4 usos do briefing original, cada um caindo no modelo que serve pra ele.
    O destino nao e o topo do grid: e o CARD, senao o clique promete um modelo
@@ -17,25 +17,25 @@ const modelos = (await getCollection('modelos', ({ data }) => data.publicado)).s
 const USOS = [
   {
     texto: 'Trabalhar e entregar',
-    href: '#modelo-mvs-02',
+    href: '#modelo-mvs-spark',
     imagem: 'uso-trabalho',
     alt: 'Homem pilotando uma bike elétrica preta de pneu largo por uma praça arborizada',
   },
   {
     texto: 'Meu dia a dia',
-    href: '#modelo-mvb-01',
+    href: '#modelo-mvb-agile',
     imagem: 'uso-dia',
     alt: 'Homem colocando sacola de compras no cesto de uma bike elétrica azul na frente de um mercado',
   },
   {
     texto: 'Mais apoio e conforto',
-    href: '#modelo-mvt-03',
+    href: '#modelo-mvt-01',
     imagem: 'uso-apoio',
     alt: 'Senhora ajustando o capacete ao lado de uma bike elétrica vermelha com as compras no cesto',
   },
   {
     texto: 'Ir pra escola',
-    href: '#modelo-mvs-01',
+    href: '#modelo-mvs-italia',
     imagem: 'uso-escola',
     alt: 'Mãe e filha de capacete em uma scooter elétrica vermelha, a menina com mochila nas costas',
   },
@@ -71,13 +71,10 @@ const USOS = [
       por indice e para em 5 (--mv-i), senao o ultimo card de uma linha longa
       demoraria a aparecer depois de ja estar visivel. */}
   <div class="mv-container pt-8 pb-24 sm:pt-12 sm:pb-32">
-    {/* 5 modelos em 3 colunas dao 3+2, com um buraco orfao na segunda linha.
-        Isso ja era verdade a 1440px e la esta certo: nao cabe mais que 3.
-        Com o container fluido, acima de 2100px de viewport o conteudo passa de
-        1730px e os 5 cards cabem numa fileira so, com ~380px cada — o mesmo
-        tamanho de card ja validado a 1440px (413px). A secao se chama "A
-        linha": mostrar a linha INTEIRA numa passada e o que ela promete.
-        4 colunas foi descartado de proposito: daria 4+1, orfao pior que 3+2.
+    {/* Com a linha 2026 sao 10 modelos: 3 colunas dao 3+3+3+1, e o orfao da
+        ultima linha e o MVT-01 de proposito (a ordem poe o triciclo, unica
+        categoria de 3 rodas, por ultimo: sozinho ele le como fechamento, nao
+        como buraco). Acima de 2100px as 5 colunas fecham 5+5 exatos.
         O breakpoint 3xl (2100px) foi registrado no @theme do global.css
         porque nenhum breakpoint de fabrica do Tailwind cai onde a conta
         fecha. Ver la o motivo de nao ser a variante arbitraria min-[2100px]. */}
