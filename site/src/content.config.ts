@@ -12,7 +12,7 @@ import { glob } from 'astro/loaders';
  * que um claim de isencao entre por engano numa spec que nao o sustenta.
  * Res. CONTRAN 996/2023, art. 2, par. 6: acima de 32 km/h a classificacao como
  * ciclomotor e automatica, e ciclomotor exige registro + ACC ou CNH A.
- * O catalogo 2026 declara 32 km/h nos modelos novos e a MVS-01 declara 35 km/h.
+ * A linha 2026 inteira declara 32 km/h (MVS-01 ajustada em ago/2026).
  * Nenhum modelo marca isencao: 32 km/h e o limite EXATO da regra e a isencao
  * so entra com ficha tecnica assinada comprovando a velocidade de fabricacao.
  * ========================================================================== */
